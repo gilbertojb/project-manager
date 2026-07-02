@@ -3,7 +3,7 @@ import { Project } from "../domain/project.entity";
 import { IProjectsRepository } from "../repositories/projects.repository";
 
 @Injectable()
-export class InMemoryProjectsRepository implements IProjectsRepository {
+export class InMemoryProjectsRepository extends IProjectsRepository {
   private projects: Map<string, Project> = new Map();
 
   async findAll(): Promise<Project[]> {
