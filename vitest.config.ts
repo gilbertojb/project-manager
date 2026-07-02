@@ -3,6 +3,7 @@ import path from "node:path";
 
 export default defineConfig({
   test: {
+    include: ['src/**/*.spec.ts'],
     globals: true,
     root: "./",
     alias: {
