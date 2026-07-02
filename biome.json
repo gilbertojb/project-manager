@@ -23,7 +23,8 @@
     "lineWidth": 100
   },
   "javascript": {
-    "formatter": { "quoteStyle": "double", "trailingCommas": "all" }
+    "formatter": { "quoteStyle": "double", "trailingCommas": "all" },
+    "parser": { "unsafeParameterDecoratorsEnabled": true }
   },
   "files": {
     "includes": ["**", "!node_modules/**", "!dist/**"]
