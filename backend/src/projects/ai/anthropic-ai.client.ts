@@ -1,6 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
 import Anthropic from "@anthropic-ai/sdk";
-import { IAiClient, type AiAnalysisInput, type AiAnalysisResult } from "./ai.client";
+import { Injectable, Logger } from "@nestjs/common";
+
+import { AiAnalysisInput, AiAnalysisResult, IAiClient } from "./ai.client";
 import { ProjectAnalysisPromptBuilder } from "./prompt-builder";
 
 @Injectable()

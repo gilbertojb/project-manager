@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common";
-import { IAiClient, type AiAnalysisInput, type AiAnalysisResult } from "./ai.client";
+import { Injectable } from '@nestjs/common';
+import { AiAnalysisInput, AiAnalysisResult, IAiClient } from './ai.client';
 
 @Injectable()
 export class AiAnalysisService {

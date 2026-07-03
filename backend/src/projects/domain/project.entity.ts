@@ -1,10 +1,5 @@
-import { randomUUID } from "node:crypto";
-import {
-  ProjectStatus,
-  ProjectRisk,
-  STATUS_TRANSITIONS,
-  UNDELETABLE_STATUSES,
-} from "./project.types";
+import { randomUUID } from 'node:crypto';
+import { ProjectRisk, ProjectStatus, STATUS_TRANSITIONS, UNDELETABLE_STATUSES } from './project.types';
 
 export interface ProjectProps {
   name: string;

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { ProjectStatus } from "../../domain/project.types";
 
 export const updateStatusSchema = z.object({
-  status: z.nativeEnum(ProjectStatus, {
+  status: z.enum(ProjectStatus, {
     error: `status must be one of: ${Object.values(ProjectStatus).join(", ")}`,
   }),
 });

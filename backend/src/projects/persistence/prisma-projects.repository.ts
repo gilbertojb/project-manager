@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import type { Project as PrismaProject } from "@prisma/client";
 import { Project } from "@/projects/domain/project.entity";
-import type { ProjectStatus, ProjectRisk } from "@/projects/domain/project.types";
+import type { ProjectRisk, ProjectStatus } from "@/projects/domain/project.types";
 import { IProjectsRepository } from "@/projects/repositories/projects.repository";
 import { PrismaService } from "@/shared/prisma/prisma.service";
 
