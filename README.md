@@ -32,12 +32,19 @@ pnpm install
 cp .env.example .env
 ```
 
-Edite o `.env` e preencha:
+Edite o `.env` e preencha `DATABASE_URL` e as variáveis do provider de IA escolhido:
 
 ```env
 PORT=3000
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/project_manager
-ANTHROPIC_API_KEY=sk-ant-...   # necessário para GET /projects/:id/ai-analysis
+
+# Escolha o provider: anthropic | gemini | openai  (padrão: anthropic)
+AI_PROVIDER=gemini
+
+# Preencha apenas a chave do provider escolhido
+ANTHROPIC_API_KEY=sk-ant-...   # anthropic.com
+GEMINI_API_KEY=AIza...         # aistudio.google.com (tier gratuito disponível)
+OPENAI_API_KEY=sk-...          # platform.openai.com (requer créditos)
 ```
 
 ### 3. Subir o banco de dados
