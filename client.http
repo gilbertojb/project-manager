@@ -1,0 +1,99 @@
+@baseUrl = http://localhost:3000
+@projectId = SUBSTITUA_PELO_ID_REAL
+
+### Criar projeto (risco LOW, curta duração e orçamento baixo)
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "nome": "Portal do Colaborador",
+  "dataInicio": "2026-08-01",
+  "previsaoTermino": "2026-09-15",
+  "orcamentoTotal": 25000,
+  "descricao": "Portal interno para gestão de benefícios e ponto eletrônico."
+}
+
+###
+
+### Criar projeto (risco HIGH, longa duração e alto orçamento)
+POST {{baseUrl}}/projects
+Content-Type: application/json
+
+{
+  "nome": "ERP Corporativo",
+  "dataInicio": "2026-07-01",
+  "previsaoTermino": "2027-06-30",
+  "orcamentoTotal": 900000,
+  "descricao": "Implantação de ERP corporativo com módulos financeiro, RH e logística."
+}
+
+###
+
+### Listar todos os projetos
+GET {{baseUrl}}/projects
+
+###
+
+### Buscar projeto por ID
+GET {{baseUrl}}/projects/{{projectId}}
+
+###
+
+### Atualizar campos do projeto
+PATCH {{baseUrl}}/projects/{{projectId}}
+Content-Type: application/json
+
+{
+  "nome": "Portal do Colaborador v2",
+  "orcamentoTotal": 35000
+}
+
+###
+
+### Avançar status: analysis → approved
+PATCH {{baseUrl}}/projects/{{projectId}}/status
+Content-Type: application/json
+
+{
+  "status": "approved"
+}
+
+###
+
+### Avançar status: approved → in_progress
+PATCH {{baseUrl}}/projects/{{projectId}}/status
+Content-Type: application/json
+
+{
+  "status": "in_progress"
+}
+
+###
+
+### Avançar status: in_progress → closed
+PATCH {{baseUrl}}/projects/{{projectId}}/status
+Content-Type: application/json
+
+{
+  "status": "closed"
+}
+
+###
+
+### Cancelar projeto (qualquer status exceto closed)
+PATCH {{baseUrl}}/projects/{{projectId}}/status
+Content-Type: application/json
+
+{
+  "status": "cancelled"
+}
+
+###
+
+### Deletar projeto (só funciona em status analysis ou approved)
+DELETE {{baseUrl}}/projects/{{projectId}}
+
+###
+
+### Obter análise de IA do projeto
+GET {{baseUrl}}/projects/{{projectId}}/ai-analysis
