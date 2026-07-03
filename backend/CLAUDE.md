@@ -7,7 +7,7 @@
 - Zod para validação de env e DTOs
 - Vitest para testes unitários
 - Prisma 7 + PostgreSQL para persistência
-- Anthropic SDK para integração de IA
+- Anthropic SDK, `@google/generative-ai` e `openai` — suporte multi-provider de IA
 - Swagger (@nestjs/swagger) para documentação da API em `/docs`
 
 ## Arquitetura
@@ -66,8 +66,15 @@ Copie `.env.example` para `.env` e preencha:
 
 ```
 PORT=3000
-ANTHROPIC_API_KEY=sk-ant-...   # necessário para GET /projects/:id/ai-analysis
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/project_manager
+
+# Escolha o provider: anthropic | gemini | openai  (padrão: anthropic)
+AI_PROVIDER=anthropic
+
+# Preencha apenas a chave do provider escolhido
+ANTHROPIC_API_KEY=sk-ant-...   # anthropic.com
+GEMINI_API_KEY=AIza...         # aistudio.google.com (tier gratuito disponível)
+OPENAI_API_KEY=sk-...          # platform.openai.com (requer créditos)
 ```
 
 ## Comandos
@@ -110,7 +117,7 @@ backend/
       repositories/         ← IProjectsRepository (contrato)
       persistence/          ← InMemoryProjectsRepository, PrismaProjectsRepository
       http/                 ← controller, DTOs, presenter
-      ai/                   ← IAiClient, AnthropicAiClient, prompt builder
+      ai/                   ← IAiClient, AnthropicAiClient, GeminiAiClient, OpenAiClient, prompt builder
       projects.module.ts
     shared/
       filters/              ← HttpExceptionFilter

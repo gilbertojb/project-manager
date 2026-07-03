@@ -149,7 +149,7 @@ O risco é recalculado automaticamente ao criar ou atualizar o projeto.
 
 ### Análise com IA
 
-O endpoint `GET /projects/:id/ai-analysis` chama a Anthropic API (Claude Haiku) e retorna:
+O endpoint `GET /projects/:id/ai-analysis` chama o provider de IA configurado e retorna:
 
 ```json
 {
@@ -159,7 +159,7 @@ O endpoint `GET /projects/:id/ai-analysis` chama a Anthropic API (Claude Haiku) 
 }
 ```
 
-Requer `ANTHROPIC_API_KEY` configurada no `.env`.
+O provider é selecionado pela variável `AI_PROVIDER` no `.env` (`anthropic` | `gemini` | `openai`). Preencha apenas a chave do provider escolhido (`ANTHROPIC_API_KEY`, `GEMINI_API_KEY` ou `OPENAI_API_KEY`).
 
 ## Testes
 

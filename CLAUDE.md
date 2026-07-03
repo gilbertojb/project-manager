@@ -2,9 +2,9 @@
 
 ## Sobre o Projeto
 
-Sistema de gerenciamento de projetos com análise de risco automática e análise executiva via IA (Claude Haiku). API REST em NestJS com persistência PostgreSQL via Prisma, e frontend SPA em React 19 + Vite 6 + TailwindCSS v4.
+Sistema de gerenciamento de projetos com análise de risco automática e análise executiva via IA (Anthropic, Gemini ou OpenAI). API REST em NestJS com persistência PostgreSQL via Prisma, e frontend SPA em React 19 + Vite 6 + TailwindCSS v4.
 
-## Estrutura do Repositório (Monorepo)
+## Estrutura do Repositório
 
 ```
 project-manager/
@@ -33,6 +33,7 @@ project-manager/
 ## Metodologia
 
 Spec Driven Development com skills do Superpowers:
+
 1. `superpowers:brainstorming` → design + aprovação
 2. `superpowers:writing-plans` → plano em `docs/plans/`
 3. `superpowers:subagent-driven-development` → execução com review loop

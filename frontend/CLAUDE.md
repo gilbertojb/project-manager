@@ -8,8 +8,10 @@
 - react-router-dom v7 — SPA mode com `createBrowserRouter`
 - @tanstack/react-query v5 — server state
 - axios — HTTP client com `baseURL` via `env.VITE_API_URL`
+- react-hook-form v7 + @hookform/resolvers — formulários com validação Zod
+- react-helmet-async — gerenciamento de `<title>` por página
 - sonner — toasts
-- zod v4 — validação de variáveis de ambiente
+- zod v4 — validação de variáveis de ambiente e schemas de formulário
 - Biome 2.x — lint + format (config própria; independente do backend)
 - pnpm 10 — gerenciador de pacotes
 
@@ -60,19 +62,33 @@ pnpm exec tsc --noEmit   # verificar tipos sem gerar arquivos
 ```
 frontend/
   src/
-    api/                        ← funções de chamada à API
+    api/
+      projects.ts               ← listProjects, getProject, createProject, updateProject, deleteProject, updateProjectStatus, getAiAnalysis
     components/
       ui/                       ← componentes shadcn/ui (instalados via CLI)
       theme/
         theme-provider.tsx      ← ThemeProvider + useTheme
+      projects/
+        project-card.tsx        ← card da listagem
+        project-form-dialog.tsx ← dialog de criar/editar projeto
+        project-form.tsx        ← formulário react-hook-form
+        project-risk-badge.tsx  ← badge de risco colorido
+        project-status-badge.tsx ← badge de status colorido
     lib/
       utils.ts                  ← cn(): string (clsx + tailwind-merge)
       axios.ts                  ← instância axios configurada
       react-query.ts            ← instância QueryClient
+      formatters.ts             ← formatCurrency, formatDate
     pages/
       _layouts/
         app.tsx                 ← layout principal com <Outlet />
-      app/                      ← páginas da área principal
+      app/
+        projects/
+          projects.tsx          ← listagem de projetos em grid de cards
+        project-detail/
+          project-detail.tsx    ← detalhe do projeto + ações de status + análise IA
+    types/
+      project.ts                ← tipos Project, ProjectStatus, NEXT_STATUS, etc.
     app.tsx                     ← root com todos os providers
     main.tsx                    ← entry point: createRoot + <App />
     routes.tsx                  ← createBrowserRouter
