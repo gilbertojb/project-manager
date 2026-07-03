@@ -1,32 +1,43 @@
 # Project Manager
 
-API REST para gerenciamento simplificado de projetos com análise de risco automática e análise executiva via IA.
+Sistema de gerenciamento de projetos com análise de risco automática e análise executiva via IA. Composto por uma API REST em NestJS e um frontend SPA em React.
 
 ## Stack
 
-- **Backend:** Node.js 20 · NestJS 11 · TypeScript (strict)
+### Backend
+- **Runtime:** Node.js 20 · NestJS 11 · TypeScript (strict)
 - **Banco de dados:** PostgreSQL via Prisma 7
 - **Validação:** Zod
 - **Testes:** Vitest
 - **Lint/formato:** Biome
 - **IA em runtime:** Anthropic API (Claude Haiku)
 
+### Frontend
+- **Build tool:** Vite 6 · React 19 · TypeScript (strict)
+- **UI:** TailwindCSS v4 · shadcn/ui (new-york)
+- **Roteamento:** react-router-dom v7
+- **Estado server:** @tanstack/react-query v5
+- **HTTP:** axios · zod (env)
+- **Lint/formato:** Biome
+
 ## Pré-requisitos
 
 - Node.js 20+
-- pnpm 9+
+- pnpm 10+
 - Docker e Docker Compose
 
 ## Setup
 
-### 1. Instalar dependências
+### Backend
+
+#### 1. Instalar dependências
 
 ```bash
 cd backend
 pnpm install
 ```
 
-### 2. Variáveis de ambiente
+#### 2. Variáveis de ambiente
 
 ```bash
 cp .env.example .env
@@ -47,20 +58,20 @@ GEMINI_API_KEY=AIza...         # aistudio.google.com (tier gratuito disponível)
 OPENAI_API_KEY=sk-...          # platform.openai.com (requer créditos)
 ```
 
-### 3. Subir o banco de dados
+#### 3. Subir o banco de dados
 
 ```bash
 docker compose up -d
 ```
 
-### 4. Aplicar migrations e seed
+#### 4. Aplicar migrations e seed
 
 ```bash
 pnpm run db:migrate   # cria as tabelas
 pnpm run db:seed      # insere 5 projetos de exemplo
 ```
 
-### 5. Iniciar o servidor
+#### 5. Iniciar o servidor
 
 ```bash
 pnpm run start:dev
@@ -68,6 +79,37 @@ pnpm run start:dev
 
 A API estará disponível em `http://localhost:3000`.  
 A documentação Swagger estará em `http://localhost:3000/docs`.
+
+---
+
+### Frontend
+
+#### 1. Instalar dependências
+
+```bash
+cd frontend
+pnpm install
+```
+
+#### 2. Variáveis de ambiente
+
+```bash
+cp .env.example .env
+```
+
+Edite o `.env`:
+
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+#### 3. Iniciar o servidor de desenvolvimento
+
+```bash
+pnpm dev
+```
+
+O frontend estará disponível em `http://localhost:5173`.
 
 ## Endpoints
 
@@ -122,14 +164,27 @@ Requer `ANTHROPIC_API_KEY` configurada no `.env`.
 ## Testes
 
 ```bash
+# Backend
+cd backend
 pnpm run test:unit
 ```
 
 ## Outros comandos
+
+### Backend
 
 ```bash
 pnpm run build        # compilar TypeScript
 pnpm run lint         # checar lint com Biome
 pnpm run format       # formatar com Biome
 pnpm run db:studio    # abrir Prisma Studio
+```
+
+### Frontend
+
+```bash
+pnpm build            # build de produção
+pnpm lint             # checar lint com Biome
+pnpm format           # formatar com Biome
+pnpm preview          # preview do build de produção
 ```

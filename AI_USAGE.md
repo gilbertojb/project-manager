@@ -4,12 +4,14 @@
 
 | Ferramenta | Modelo | Propósito |
 |------------|--------|-----------|
-| **Claude Code** | claude-sonnet-4-6 | Assistente de desenvolvimento no terminal — planejamento, geração e revisão de código |
+| **Claude Code** | claude-sonnet-4-6 | Assistente de desenvolvimento no terminal — planejamento, geração e revisão de código (backend e frontend) |
 | **Anthropic API** | claude-haiku-4-5-20251001 | Chamada em runtime para o endpoint `GET /projects/:id/ai-analysis` |
 
 ---
 
 ## Para Quais Partes do Desafio a IA foi Utilizada
+
+### Backend
 
 | Área | O que a IA ajudou a fazer |
 |------|---------------------------|
@@ -21,6 +23,18 @@
 | Configuração Prisma 7 | Adaptação para a nova API com `prisma.config.ts` e WASM adapter |
 | Testes | Escrita dos specs com `InMemoryProjectsRepository` como double real |
 | Swagger | Decoradores `@ApiOperation` e `@ApiResponse` no controller |
+
+### Frontend
+
+A stack, a estrutura de pastas e todas as decisões técnicas do frontend foram definidas pelo desenvolvedor. A IA atuou como executor — gerou os arquivos de configuração, código boilerplate e componentes conforme especificado.
+
+| Área | O que a IA executou (sob especificação do desenvolvedor) |
+|------|----------------------------------------------------------|
+| Scaffold | Criação de `package.json`, `tsconfig.json`, `vite.config.ts` com `@tailwindcss/vite` |
+| CSS vars shadcn/ui | Geração das variáveis oklch completas para os temas light e dark |
+| ThemeProvider | Componente de contexto para persistência do tema no `localStorage` |
+| Routing | Configuração do `createBrowserRouter` com layout aninhado e rota index |
+| Biome frontend | Configuração independente com regras JSX (`useExhaustiveDependencies`, `useHookAtTopLevel`) e a11y |
 
 ---
 
@@ -101,4 +115,5 @@ Estas decisões foram minhas, sem sugestão direta da IA:
 - Sem cache das análises — cada chamada ao endpoint gera uma nova requisição à API Anthropic
 - Sem autenticação ou autorização
 - `risk` armazenado no banco como `text` sem constraint de enum — valores inválidos só são rejeitados pela entidade na escrita
-- Frontend não implementado nesta entrega
+- Frontend em bootstrap — apenas rota `/` com Hello World; telas de funcionalidade ainda não implementadas
+- `react-helmet-async@2.0.5` não declara suporte formal ao React 19 (funciona em runtime)

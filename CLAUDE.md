@@ -2,16 +2,16 @@
 
 ## Sobre o Projeto
 
-Sistema de gerenciamento de projetos com análise de risco automática e análise executiva via IA (Claude Haiku). API REST em NestJS com persistência PostgreSQL via Prisma.
+Sistema de gerenciamento de projetos com análise de risco automática e análise executiva via IA (Claude Haiku). API REST em NestJS com persistência PostgreSQL via Prisma, e frontend SPA em React 19 + Vite 6 + TailwindCSS v4.
 
 ## Estrutura do Repositório (Monorepo)
 
 ```
 project-manager/
   backend/          ← API NestJS (ver backend/CLAUDE.md)
-  frontend/         ← (planejado)
+  frontend/         ← SPA React (ver frontend/CLAUDE.md)
   docs/
-    specs/          ← design specs numeradas (01–07)
+    specs/          ← design specs numeradas (01–08)
     plans/          ← planos de implementação com código
   docker-compose.yml está em backend/ (infraestrutura do backend)
   client.http       ← exemplos de chamadas à API (VSCode REST Client)
@@ -28,7 +28,7 @@ project-manager/
 ## Projetos
 
 - `backend/` — ver `backend/CLAUDE.md` para stack, arquitetura e comandos
-- `frontend/` — a definir
+- `frontend/` — ver `frontend/CLAUDE.md` para stack, estrutura e comandos
 
 ## Metodologia
 
