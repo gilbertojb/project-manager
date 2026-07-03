@@ -1,119 +1,108 @@
 # AI Usage Documentation
 
-## Ferramentas e Modelos Utilizados
+## Ferramentas e Modelos
 
 | Ferramenta | Modelo | Propósito |
 |------------|--------|-----------|
-| **Claude Code** | claude-sonnet-4-6 | Assistente de desenvolvimento no terminal — planejamento, geração e revisão de código (backend e frontend) |
-| **Anthropic API** | claude-haiku-4-5-20251001 | Chamada em runtime para o endpoint `GET /projects/:id/ai-analysis` |
+| **Claude Code** | claude-sonnet-4-6 | Assistente de desenvolvimento no terminal — execução de tarefas sob especificação do desenvolvedor |
+| **Anthropic API** | claude-haiku-4-5-20251001 | Provider de análise executiva em runtime (`GET /projects/:id/ai-analysis`) |
+| **Google Generative AI** | gemini-3.5-flash | Provider alternativo de análise executiva em runtime |
+| **OpenAI API** | gpt-4o-mini | Provider alternativo de análise executiva em runtime |
 
 ---
 
-## Para Quais Partes do Desafio a IA foi Utilizada
+## Decisões Técnicas do Desenvolvedor
 
-### Backend
+Todas as decisões de arquitetura, stack e design foram tomadas pelo desenvolvedor antes ou durante a interação com a IA. A IA atuou como executor, não como arquiteto.
 
-| Área | O que a IA ajudou a fazer |
-|------|---------------------------|
-| Arquitetura | Definir a separação em camadas (domain, use-cases, http, persistence, ai) |
-| Entidade de domínio | Estrutura da classe `Project` com padrão de fábrica e acesso privado |
-| Cálculo de risco | Implementação da lógica com "prevalece o maior risco" |
-| Transições de status | Tabela `STATUS_TRANSITIONS` e validação no `transitionTo` |
-| Módulo de IA | Estrutura `IAiClient` / `AnthropicAiClient` / `ProjectAnalysisPromptBuilder` |
-| Configuração Prisma 7 | Adaptação para a nova API com `prisma.config.ts` e WASM adapter |
-| Testes | Escrita dos specs com `InMemoryProjectsRepository` como double real |
-| Swagger | Decoradores `@ApiOperation` e `@ApiResponse` no controller |
+### Stack e Ferramentas
+
+| Decisão | Escolha | Alternativa recusada | Motivo |
+|---------|---------|----------------------|--------|
+| Testes | Vitest | Jest | Integração nativa com TypeScript/ESM e execução mais rápida |
+| Lint + formato | Biome | ESLint + Prettier | Ferramenta única, configuração mínima, sem conflitos |
+| Validação | Zod | `class-validator` | Type-safe sem decoradores; melhor integração com TypeScript estrito |
+| Provider de IA (runtime) | Multi-provider plugável | Acoplado ao Anthropic | Permite trocar o modelo sem alterar lógica de negócio |
+| Campos da API | Inglês no domínio, português na camada HTTP | Português em todo o stack | Consistência REST padrão no domínio; nomes PT-BR acessíveis no DTO |
+| `risk` no banco | `text` sem enum constraint | Enum no schema | Regra de negócio pertence à entidade; banco não deve precisar de migration a cada mudança de critério |
+
+### Arquitetura
+
+- **Clean Architecture em 3 camadas** (`domain` / `use-cases` / `http` + `persistence`) — definida antes de qualquer geração de código
+- **Entidade como autoridade de negócio** — `risk` é calculado dentro da classe `Project`, nunca no use-case ou repositório; status segue tabela `STATUS_TRANSITIONS` validada na própria entidade
+- **Factory methods `Project.create()` + `Project.restore()`** — separação explícita entre criação de novo projeto (com cálculo de risco e status inicial) e reconstituição a partir da persistência
+- **`IAiClient` como abstração** — classe abstrata com `AnthropicAiClient`, `GeminiAiClient` e `OpenAiClient` como implementações; o `ProjectsModule` seleciona o provider via `AI_PROVIDER` sem acoplar o serviço a nenhuma SDK
+- **Seed com entidade, não com ORM** — `Project.create()` é chamado no seed para garantir que as regras de risco e status inicial sejam aplicadas, em vez de inserir dados brutos via `prisma.project.createMany()`
+- **`InMemoryProjectsRepository` como double real** — implementação concreta da interface usada nos testes de use-cases; sem mocks de framework, sem vazamento de detalhe de infraestrutura nos testes
+- **Prompt de análise em inglês com resposta em PT-BR** — modelos de linguagem têm raciocínio mais preciso em inglês; a instrução de idioma fica no prompt, não no código
 
 ### Frontend
 
-A stack, a estrutura de pastas e todas as decisões técnicas do frontend foram definidas pelo desenvolvedor. A IA atuou como executor — gerou os arquivos de configuração, código boilerplate e componentes conforme especificado.
-
-| Área | O que a IA executou (sob especificação do desenvolvedor) |
-|------|----------------------------------------------------------|
-| Scaffold | Criação de `package.json`, `tsconfig.json`, `vite.config.ts` com `@tailwindcss/vite` |
-| CSS vars shadcn/ui | Geração das variáveis oklch completas para os temas light e dark |
-| ThemeProvider | Componente de contexto para persistência do tema no `localStorage` |
-| Routing | Configuração do `createBrowserRouter` com layout aninhado e rota index |
-| Biome frontend | Configuração independente com regras JSX (`useExhaustiveDependencies`, `useHookAtTopLevel`) e a11y |
+- **TailwindCSS v4** com plugin Vite (`@tailwindcss/vite`) — sem `tailwind.config.js` nem `postcss.config.js`, que são padrões da v3
+- **shadcn/ui new-york com oklch** — CSS variables com gamut ampliado para fidelidade de cor nos temas dark/light
+- **react-hook-form + Zod** — mesma biblioteca de validação do backend, esquemas reutilizáveis
+- **`@tanstack/react-query`** para server state — sem Redux ou Zustand; mutations invalidam queries automaticamente
+- **`canCancelProject` e `NEXT_STATUS`** como funções puras em `types/project.ts` — lógica de transição de status replicada no frontend para habilitar/desabilitar ações na UI sem round-trip ao backend
 
 ---
 
-## Principais Prompts Utilizados
+## Como a IA foi Utilizada
 
-### Design da entidade de domínio
+### Backend
 
-> "Preciso modelar uma entidade `Project` em TypeScript com Clean Architecture. Os campos são: id, name, startDate, endDate, budget, description, status e risk. O status inicial deve ser sempre `analysis` e o risco deve ser calculado automaticamente com base no orçamento e no prazo. Me sugira uma estrutura com construtor privado e factory method."
+A IA foi usada para gerar código com base em especificações detalhadas fornecidas pelo desenvolvedor. Em nenhum caso a IA definiu a arquitetura ou as regras de negócio.
 
-A IA propôs o padrão `Project.create()` + `Project.restore()`, que eu adotei. O getter `data` foi ideia minha para facilitar a cópia defensiva ao persistir.
+| Área | Como a IA foi utilizada |
+|------|------------------------|
+| Entidade de domínio | Geração da estrutura `Project` conforme especificação de campos, factory methods e método `calculateRisk` |
+| Cálculo de risco | Implementação da lógica com critérios e precedência definidos previamente pelo desenvolvedor |
+| Transições de status | Geração da tabela `STATUS_TRANSITIONS` e do método `transitionTo` a partir das regras especificadas |
+| Módulo de IA | Geração dos três clientes (`AnthropicAiClient`, `GeminiAiClient`, `OpenAiClient`) com a interface `IAiClient` já desenhada |
+| Configuração Prisma 7 | Adaptação para a nova API (`prisma.config.ts`, WASM adapter) após o desenvolvedor identificar breaking changes |
+| Testes | Geração dos specs com `InMemoryProjectsRepository` conforme o padrão definido pelo desenvolvedor |
+| Swagger | Adição de decoradores `@ApiOperation` e `@ApiResponse` no controller existente |
 
-### Regra de cálculo de risco
+### Frontend
 
-> "Implemente o método `calculateRisk` com as seguintes regras: baixo (orçamento ≤ 100k e prazo ≤ 3 meses), médio (orçamento entre 100k e 500k ou prazo entre 3 e 6 meses), alto (orçamento > 500k ou prazo > 6 meses). Quando mais de uma regra se aplicar, prevalece o maior risco."
+A IA executou a geração de boilerplate e componentes conforme layout, estrutura de props e comportamento especificados pelo desenvolvedor.
 
-A IA gerou a lógica com `Math.max` sobre o array ordenado `[LOW, MEDIUM, HIGH]`. Validei o comportamento nos testes antes de aceitar.
-
-### Separação da camada de IA
-
-> "Quero um serviço de análise de IA em NestJS que não exponha a chamada diretamente no controller. Me sugira a separação mínima de responsabilidades para manter testabilidade."
-
-A IA propôs `IAiClient` (classe abstrata) + `AnthropicAiClient` (implementação) + `AiAnalysisService` (orquestra) + `ProjectAnalysisPromptBuilder` (constrói o prompt). Adotei essa estrutura integralmente — ela é bem justificada pelo princípio de inversão de dependência.
-
-### Prompt enviado à API Anthropic em runtime
-
-> "You are a senior project management analyst. Analyze the following project and return a valid JSON object with exactly these keys: 'summary' (string), 'attentionPoints' (array of strings), and 'executiveRecommendation' (string). Write all content in Brazilian Portuguese. [...] Return ONLY the JSON object, no markdown fences, no extra text."
-
-Escrevi este prompt por conta própria após testar que o modelo tendia a envolver o JSON em blocos de código markdown. A instrução "no markdown fences" e a especificação exata das chaves foi necessária para tornar o parse confiável.
-
-### Configuração do Prisma 7
-
-> "Estou usando Prisma 7. Como configuro o cliente com `prisma.config.ts` em vez do `url = env()` no schema? O projeto usa PostgreSQL e preciso que o seed use a entidade `Project` em vez de inserir dados brutos."
-
-A IA identificou as breaking changes do Prisma 7 (nova API de config, WASM client com adapter) e gerou o `prisma.config.ts`. Ajustei o seed manualmente para usar `Project.create()` em vez de `prisma.project.create()` direto, garantindo que as regras de negócio fossem respeitadas.
+| Área | Como a IA foi utilizada |
+|------|------------------------|
+| Scaffold | Geração de `package.json`, `tsconfig.json`, `vite.config.ts` com a stack já decidida |
+| CSS vars / tema | Geração das variáveis oklch para temas light e dark conforme o design system definido |
+| Componentes | `ProjectCard`, `ProjectFormDialog`, `ProjectRiskBadge`, `ProjectStatusBadge` gerados sob especificação de layout e comportamento |
+| Páginas | `ProjectsPage` (grid de cards) e `ProjectDetailPage` (detalhe + ações de status + análise IA) com fluxo definido pelo desenvolvedor |
+| Integração API | Funções em `api/projects.ts` mapeando os endpoints da API e o hook de análise IA com estado de loading |
 
 ---
 
 ## O que foi Aceito, Ajustado ou Descartado
 
 ### Aceito sem modificação
-- Estrutura de pastas em Clean Architecture (domain / use-cases / http / persistence / ai)
+
 - Padrão `Project.create()` + `Project.restore()` (factory + reconstituição)
-- `InMemoryProjectsRepository` como double real de testes (sem mocks de framework)
-- Separação `IAiClient` / `AnthropicAiClient` / `AiAnalysisService`
+- `InMemoryProjectsRepository` como double real de testes
+- Separação `IAiClient` / `*AiClient` / `AiAnalysisService` / `ProjectAnalysisPromptBuilder`
 - `ZodValidationPipe` genérico e reutilizável
-- Tabela `STATUS_TRANSITIONS` como `Record<ProjectStatus, ProjectStatus[]>`
+- `STATUS_TRANSITIONS` como `Record<ProjectStatus, ProjectStatus[]>`
 
 ### Ajustado após revisão
-- **Cálculo de risco:** a IA gerou inicialmente com `if/else` encadeado. Reescrevi usando arrays ordenados e `Math.max` para ficar mais declarativo e fácil de estender.
-- **Prompt de análise:** versão inicial da IA retornava markdown fences ao redor do JSON. Adicionei instrução explícita "no markdown fences" e tratamento de erro no parse.
-- **Seed:** gerado com `prisma.project.createMany()` diretamente. Reescrevi usando `Project.create()` para que as regras de negócio (risco calculado, status inicial) fossem aplicadas consistentemente.
-- **`prisma.config.ts`:** a IA não conhecia a API exata do Prisma 7 e gerou código com a API do Prisma 5. Corrigi com base na documentação oficial.
+
+- **Cálculo de risco:** versão inicial gerada com `if/else` encadeado. Reescrito com arrays ordenados e índice de prioridade para ficar declarativo e extensível.
+- **Prompt de análise:** versão inicial retornava markdown fences ao redor do JSON. Adicionada instrução explícita e tratamento de parse com fallback de erro explícito.
+- **Seed:** gerado originalmente com `prisma.project.createMany()`. Reescrito usando `Project.create()` para respeitar as regras de negócio.
+- **`prisma.config.ts`:** a IA gerou código com a API do Prisma 5. Corrigido com base na documentação oficial do Prisma 7.
 
 ### Descartado
-- **Padrão Either/Result monad:** a IA sugeriu para tratamento de erros nos use-cases. Descartei por adicionar complexidade desnecessária ao escopo do desafio — exceções HTTP do NestJS são suficientes.
-- **Campos da API em português:** a IA sugeriu nomear os campos da resposta HTTP em português (`nomeDoProejto`, `dataInicio` etc.). Mantive inglês no domínio e na API (`name`, `startDate`) para maior consistência com convenções REST e facilidade de consumo pelo frontend.
 
----
-
-## Decisões Técnicas Tomadas pelo Candidato
-
-Estas decisões foram minhas, sem sugestão direta da IA:
-
-1. **Vitest em vez de Jest** — pela integração nativa com TypeScript e velocidade superior em projetos com ESM.
-2. **Biome em vez de ESLint + Prettier** — ferramenta única para lint e formatação, configuração mínima.
-3. **Zod em vez de `class-validator`** — validação type-safe sem decoradores, melhor integração com TypeScript estrito.
-4. **Campos da API em inglês** — contrariamente à sugestão da IA, mantive inglês na API para consistência REST padrão.
-5. **`risk` não persistido como constraint de enum no banco** — a validação é feita pela entidade; no banco é `text` para manter flexibilidade sem migrations a cada mudança de regra.
-6. **Prompt de análise escrito em inglês com resposta em PT-BR** — modelos de linguagem tendem a ter raciocínio de melhor qualidade em inglês; a instrução de responder em português fica no prompt.
-7. **`CLOSED → CANCELLED` permitido** — o spec diz "qualquer status → cancelado", então incluí `CLOSED` nas transições possíveis, mesmo que o caso de uso seja raro na prática.
+- **Either/Result monad nos use-cases:** sugestão da IA para tratamento de erros. Descartado por adicionar complexidade desnecessária ao escopo — exceções HTTP do NestJS são suficientes.
+- **Campos da API em português no domínio:** sugestão da IA (`nomeDoProejto`, `dataInicio`). Mantido inglês no domínio e na API por consistência REST padrão.
 
 ---
 
 ## Limitações Conhecidas
 
-- Sem paginação no endpoint de listagem (`GET /projects` retorna todos os registros)
-- Análise de IA requer `ANTHROPIC_API_KEY` configurada; sem ela o endpoint retorna erro 500
-- Sem cache das análises — cada chamada ao endpoint gera uma nova requisição à API Anthropic
+- Sem paginação no `GET /projects` — retorna todos os registros
+- Análise de IA sem cache — cada chamada ao endpoint gera nova requisição ao provider
 - Sem autenticação ou autorização
-- `risk` armazenado no banco como `text` sem constraint de enum — valores inválidos só são rejeitados pela entidade na escrita
-- Frontend em bootstrap — apenas rota `/` com Hello World; telas de funcionalidade ainda não implementadas
-- `react-helmet-async@2.0.5` não declara suporte formal ao React 19 (funciona em runtime)
+- `risk` armazenado como `text` no banco, sem constraint de enum — validação feita exclusivamente pela entidade na escrita
