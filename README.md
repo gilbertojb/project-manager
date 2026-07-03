@@ -77,8 +77,13 @@ pnpm run db:seed      # insere 5 projetos de exemplo
 pnpm run start:dev
 ```
 
-A API estará disponível em `http://localhost:3000`.  
-A documentação Swagger estará em `http://localhost:3000/docs`.
+A API estará disponível em `http://localhost:3000`.
+
+| URL | Conteúdo |
+|-----|----------|
+| `http://localhost:3000/docs` | Swagger UI interativo |
+| `http://localhost:3000/docs-json` | Spec OpenAPI 3.0 em JSON |
+| `http://localhost:3000/docs-yaml` | Spec OpenAPI 3.0 em YAML |
 
 ---
 
