@@ -134,9 +134,14 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <div className="flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             <ProjectStatusBadge status={project.status} />
             <ProjectRiskBadge risk={project.risk} />
+            {project.aiAnalysis && (
+              <span title="Análise com IA disponível">
+                <BrainCircuit className="h-4 w-4 text-violet-400" />
+              </span>
+            )}
           </div>
         </CardHeader>
 
