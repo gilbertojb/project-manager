@@ -72,9 +72,18 @@ describe("Project Entity", () => {
     );
   });
 
-  it("should allow cancellation from any status", () => {
+  it("should allow cancellation from analysis status", () => {
     const project = Project.create(baseProps);
     expect(() => project.transitionTo(ProjectStatus.CANCELLED)).not.toThrow();
+  });
+
+  it("should allow cancellation from closed status", () => {
+    const project = Project.create(baseProps);
+    project.transitionTo(ProjectStatus.APPROVED);
+    project.transitionTo(ProjectStatus.IN_PROGRESS);
+    project.transitionTo(ProjectStatus.CLOSED);
+    expect(() => project.transitionTo(ProjectStatus.CANCELLED)).not.toThrow();
+    expect(project.status).toBe(ProjectStatus.CANCELLED);
   });
 
   it("should recalculate risk when budget is updated", () => {

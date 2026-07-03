@@ -38,9 +38,19 @@ describe("UpdateProjectStatusUseCase", () => {
     );
   });
 
-  it("should allow cancellation from any status", async () => {
+  it("should allow cancellation from analysis status", async () => {
     const project = makeProject();
     await repo.create(project);
+    const updated = await sut.execute(project.id, ProjectStatus.CANCELLED);
+    expect(updated.status).toBe(ProjectStatus.CANCELLED);
+  });
+
+  it("should allow cancellation from closed status", async () => {
+    const project = makeProject();
+    await repo.create(project);
+    await sut.execute(project.id, ProjectStatus.APPROVED);
+    await sut.execute(project.id, ProjectStatus.IN_PROGRESS);
+    await sut.execute(project.id, ProjectStatus.CLOSED);
     const updated = await sut.execute(project.id, ProjectStatus.CANCELLED);
     expect(updated.status).toBe(ProjectStatus.CANCELLED);
   });

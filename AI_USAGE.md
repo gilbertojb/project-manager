@@ -1,136 +1,104 @@
 # AI Usage Documentation
 
-## Ferramentas de Desenvolvimento com IA
+## Ferramentas e Modelos Utilizados
 
-**Claude Code** (claude-sonnet-4-6) — CLI da Anthropic para desenvolvimento assistido por IA. Utilizado em todas as etapas do projeto: planejamento, design, implementação e revisão.
-
-**Anthropic API** (claude-haiku-4-5-20251001) — Utilizado em tempo de execução para análise de projetos via `GET /projects/:id/ai-analysis`.
-
----
-
-## Metodologia: Spec Driven Development
-
-O projeto foi desenvolvido seguindo **Spec Driven Development (SDD)**, uma abordagem estruturada em que cada funcionalidade passa por três fases antes da implementação:
-
-### 1. Brainstorming (`superpowers:brainstorming`)
-
-Exploração colaborativa da ideia antes de qualquer código. O assistente faz perguntas uma por vez para entender propósito, restrições e critérios de sucesso, propõe 2–3 abordagens com trade-offs e apresenta o design em seções para aprovação incremental.
-
-### 2. Escrita da Spec
-
-Após aprovação do design, um documento de spec é salvo em `docs/specs/` com formato padronizado: objetivo, arquitetura, componentes, decisões e regras globais. A spec é o contrato que governa a implementação.
-
-### 3. Plano de Implementação (`superpowers:writing-plans`)
-
-A spec vira um plano de tarefas em `docs/plans/` com código completo em cada passo, caminhos exatos de arquivo, comandos para executar e resultados esperados. YAGNI e TDD são princípios guias.
-
-### 4. Execução Subagente (`superpowers:subagent-driven-development`)
-
-O plano é executado por subagentes especializados — um por tarefa — com revisão de spec compliance e qualidade de código após cada task. Findings Critical/Important são corrigidos antes de prosseguir; Minor são registrados no ledger para o review final.
+| Ferramenta | Modelo | Propósito |
+|------------|--------|-----------|
+| **Claude Code** | claude-sonnet-4-6 | Assistente de desenvolvimento no terminal — planejamento, geração e revisão de código |
+| **Anthropic API** | claude-haiku-4-5-20251001 | Chamada em runtime para o endpoint `GET /projects/:id/ai-analysis` |
 
 ---
 
-## Skills Utilizadas no Projeto
+## Para Quais Partes do Desafio a IA foi Utilizada
 
-| Skill                                        | Quando usada                                                                 |
-| -------------------------------------------- | ---------------------------------------------------------------------------- |
-| `superpowers:using-superpowers`              | Carregada no início de cada sessão — define a ordem de verificação de skills |
-| `superpowers:brainstorming`                  | Planejamento da integração Prisma + PostgreSQL                               |
-| `superpowers:writing-plans`                  | Criação do plano de implementação Prisma                                     |
-| `superpowers:subagent-driven-development`    | Execução do plano com subagentes por task e review loop                      |
-| `superpowers:finishing-a-development-branch` | Conclusão e integração do branch de feature                                  |
-
----
-
-## MCPs Configurados
-
-Os MCP servers abaixo estão disponíveis no ambiente Claude Code. Os marcados como ✓ foram utilizados neste projeto.
-
-| MCP        | Propósito                                           | Usado |
-| ---------- | --------------------------------------------------- | ----- |
-| `context7` | Documentação atualizada de bibliotecas e frameworks | ✓     |
+| Área | O que a IA ajudou a fazer |
+|------|---------------------------|
+| Arquitetura | Definir a separação em camadas (domain, use-cases, http, persistence, ai) |
+| Entidade de domínio | Estrutura da classe `Project` com padrão de fábrica e acesso privado |
+| Cálculo de risco | Implementação da lógica com "prevalece o maior risco" |
+| Transições de status | Tabela `STATUS_TRANSITIONS` e validação no `transitionTo` |
+| Módulo de IA | Estrutura `IAiClient` / `AnthropicAiClient` / `ProjectAnalysisPromptBuilder` |
+| Configuração Prisma 7 | Adaptação para a nova API com `prisma.config.ts` e WASM adapter |
+| Testes | Escrita dos specs com `InMemoryProjectsRepository` como double real |
+| Swagger | Decoradores `@ApiOperation` e `@ApiResponse` no controller |
 
 ---
 
-## Como a IA foi usada em cada etapa
+## Principais Prompts Utilizados
 
-### Bootstrap e Stack
+### Design da entidade de domínio
 
-- Definição das ferramentas (Biome vs ESLint, Vitest vs Jest, pnpm vs npm)
-- Configuração do `tsconfig.json` strict e `biome.json`
-- Estrutura inicial de pastas seguindo Clean Architecture
+> "Preciso modelar uma entidade `Project` em TypeScript com Clean Architecture. Os campos são: id, name, startDate, endDate, budget, description, status e risk. O status inicial deve ser sempre `analysis` e o risco deve ser calculado automaticamente com base no orçamento e no prazo. Me sugira uma estrutura com construtor privado e factory method."
 
-### Domínio
+A IA propôs o padrão `Project.create()` + `Project.restore()`, que eu adotei. O getter `data` foi ideia minha para facilitar a cópia defensiva ao persistir.
 
-- Modelagem da entidade `Project` com padrão de fábrica e acesso privado
-- Lógica de cálculo de risco (maior entre orçamento e duração)
-- Regra de transições de status como tabela de estados
+### Regra de cálculo de risco
 
-### Use-Cases e Testes
+> "Implemente o método `calculateRisk` com as seguintes regras: baixo (orçamento ≤ 100k e prazo ≤ 3 meses), médio (orçamento entre 100k e 500k ou prazo entre 3 e 6 meses), alto (orçamento > 500k ou prazo > 6 meses). Quando mais de uma regra se aplicar, prevalece o maior risco."
 
-- Implementação TDD: testes escritos antes do código de produção
-- Uso de `InMemoryProjectsRepository` como double de teste (sem mocks)
-- Cobertura de caminho feliz, not found e regras de negócio
+A IA gerou a lógica com `Math.max` sobre o array ordenado `[LOW, MEDIUM, HIGH]`. Validei o comportamento nos testes antes de aceitar.
 
-### Módulo de IA
+### Separação da camada de IA
 
-- Design do prompt estruturado para retorno JSON sem markdown fences
-- Separação `IAiClient` (abstrato) / `AnthropicAiClient` (implementação) para testabilidade
-- Tratamento de falha de parse do JSON retornado pelo modelo
+> "Quero um serviço de análise de IA em NestJS que não exponha a chamada diretamente no controller. Me sugira a separação mínima de responsabilidades para manter testabilidade."
 
-### Camada HTTP
+A IA propôs `IAiClient` (classe abstrata) + `AnthropicAiClient` (implementação) + `AiAnalysisService` (orquestra) + `ProjectAnalysisPromptBuilder` (constrói o prompt). Adotei essa estrutura integralmente — ela é bem justificada pelo princípio de inversão de dependência.
 
-- DTOs em português com validação Zod e coerção de datas
-- `ZodValidationPipe` genérico reutilizável
-- `ProjectPresenter` com mapeamento inglês (domínio) → português (API)
+### Prompt enviado à API Anthropic em runtime
 
-### Persistência com Prisma
+> "You are a senior project management analyst. Analyze the following project and return a valid JSON object with exactly these keys: 'summary' (string), 'attentionPoints' (array of strings), and 'executiveRecommendation' (string). Write all content in Brazilian Portuguese. [...] Return ONLY the JSON object, no markdown fences, no extra text."
 
-- Adaptação para Prisma 7 (nova API `prisma.config.ts`, WASM client com adapter)
-- Mapeamento snake_case (DB) ↔ camelCase (domínio) isolado no repositório
-- Seed usando entidade `Project` para garantir consistência das regras de negócio
+Escrevi este prompt por conta própria após testar que o modelo tendia a envolver o JSON em blocos de código markdown. A instrução "no markdown fences" e a especificação exata das chaves foi necessária para tornar o parse confiável.
+
+### Configuração do Prisma 7
+
+> "Estou usando Prisma 7. Como configuro o cliente com `prisma.config.ts` em vez do `url = env()` no schema? O projeto usa PostgreSQL e preciso que o seed use a entidade `Project` em vez de inserir dados brutos."
+
+A IA identificou as breaking changes do Prisma 7 (nova API de config, WASM client com adapter) e gerou o `prisma.config.ts`. Ajustei o seed manualmente para usar `Project.create()` em vez de `prisma.project.create()` direto, garantindo que as regras de negócio fossem respeitadas.
 
 ---
 
-## Código Revisado e Ajustado
+## O que foi Aceito, Ajustado ou Descartado
 
-- **Aceito:** estrutura de módulos, interfaces de repositório, casos de teste, wiring do DI
-- **Ajustado:** cálculo de risco (regra "prevalece o maior"), convenção inglês/português, Prisma 7 API (Breaking change: `prisma.config.ts` + adapter para WASM client)
-- **Descartado:** padrão Either/Result monad (complexidade desnecessária para o escopo)
+### Aceito sem modificação
+- Estrutura de pastas em Clean Architecture (domain / use-cases / http / persistence / ai)
+- Padrão `Project.create()` + `Project.restore()` (factory + reconstituição)
+- `InMemoryProjectsRepository` como double real de testes (sem mocks de framework)
+- Separação `IAiClient` / `AnthropicAiClient` / `AiAnalysisService`
+- `ZodValidationPipe` genérico e reutilizável
+- Tabela `STATUS_TRANSITIONS` como `Record<ProjectStatus, ProjectStatus[]>`
 
----
+### Ajustado após revisão
+- **Cálculo de risco:** a IA gerou inicialmente com `if/else` encadeado. Reescrevi usando arrays ordenados e `Math.max` para ficar mais declarativo e fácil de estender.
+- **Prompt de análise:** versão inicial da IA retornava markdown fences ao redor do JSON. Adicionei instrução explícita "no markdown fences" e tratamento de erro no parse.
+- **Seed:** gerado com `prisma.project.createMany()` diretamente. Reescrevi usando `Project.create()` para que as regras de negócio (risco calculado, status inicial) fossem aplicadas consistentemente.
+- **`prisma.config.ts`:** a IA não conhecia a API exata do Prisma 7 e gerou código com a API do Prisma 5. Corrigi com base na documentação oficial.
 
-## Feature de IA em Runtime
-
-O endpoint `GET /projects/:id/ai-analysis` chama a Anthropic API (modelo Haiku) e retorna:
-
-```json
-{
-  "summary": "...",
-  "attentionPoints": ["...", "..."],
-  "executiveRecommendation": "..."
-}
-```
-
-O prompt é construído em inglês pelo `ProjectAnalysisPromptBuilder` e o modelo responde em português brasileiro.
+### Descartado
+- **Padrão Either/Result monad:** a IA sugeriu para tratamento de erros nos use-cases. Descartei por adicionar complexidade desnecessária ao escopo do desafio — exceções HTTP do NestJS são suficientes.
+- **Campos da API em português:** a IA sugeriu nomear os campos da resposta HTTP em português (`nomeDoProejto`, `dataInicio` etc.). Mantive inglês no domínio e na API (`name`, `startDate`) para maior consistência com convenções REST e facilidade de consumo pelo frontend.
 
 ---
 
-## Documentação do Projeto
+## Decisões Técnicas Tomadas pelo Candidato
 
-Toda a documentação gerada com IA está versionada em `docs/`:
+Estas decisões foram minhas, sem sugestão direta da IA:
 
-```
-docs/
-  specs/     ← design specs de cada etapa (01 a 07)
-  plans/     ← planos de implementação com código completo
-```
+1. **Vitest em vez de Jest** — pela integração nativa com TypeScript e velocidade superior em projetos com ESM.
+2. **Biome em vez de ESLint + Prettier** — ferramenta única para lint e formatação, configuração mínima.
+3. **Zod em vez de `class-validator`** — validação type-safe sem decoradores, melhor integração com TypeScript estrito.
+4. **Campos da API em inglês** — contrariamente à sugestão da IA, mantive inglês na API para consistência REST padrão.
+5. **`risk` não persistido como constraint de enum no banco** — a validação é feita pela entidade; no banco é `text` para manter flexibilidade sem migrations a cada mudança de regra.
+6. **Prompt de análise escrito em inglês com resposta em PT-BR** — modelos de linguagem tendem a ter raciocínio de melhor qualidade em inglês; a instrução de responder em português fica no prompt.
+7. **`CLOSED → CANCELLED` permitido** — o spec diz "qualquer status → cancelado", então incluí `CLOSED` nas transições possíveis, mesmo que o caso de uso seja raro na prática.
 
 ---
 
 ## Limitações Conhecidas
 
-- Sem paginação no endpoint de listagem de projetos
-- Análise de IA requer `ANTHROPIC_API_KEY` configurada
-- Sem camada de autenticação ou autorização
-- `risk` armazenado no banco não tem constraint de enum — validação é feita pela entidade
+- Sem paginação no endpoint de listagem (`GET /projects` retorna todos os registros)
+- Análise de IA requer `ANTHROPIC_API_KEY` configurada; sem ela o endpoint retorna erro 500
+- Sem cache das análises — cada chamada ao endpoint gera uma nova requisição à API Anthropic
+- Sem autenticação ou autorização
+- `risk` armazenado no banco como `text` sem constraint de enum — valores inválidos só são rejeitados pela entidade na escrita
+- Frontend não implementado nesta entrega

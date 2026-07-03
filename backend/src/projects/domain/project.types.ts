@@ -16,7 +16,7 @@ export const STATUS_TRANSITIONS: Record<ProjectStatus, ProjectStatus[]> = {
   [ProjectStatus.ANALYSIS]: [ProjectStatus.APPROVED, ProjectStatus.CANCELLED],
   [ProjectStatus.APPROVED]: [ProjectStatus.IN_PROGRESS, ProjectStatus.CANCELLED],
   [ProjectStatus.IN_PROGRESS]: [ProjectStatus.CLOSED, ProjectStatus.CANCELLED],
-  [ProjectStatus.CLOSED]: [],
+  [ProjectStatus.CLOSED]: [ProjectStatus.CANCELLED],
   [ProjectStatus.CANCELLED]: [],
 };
 
