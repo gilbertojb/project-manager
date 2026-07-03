@@ -13,10 +13,12 @@ model Project {
   end_date    DateTime
   budget      Float
   description String
-  status      String
-  risk        String
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  status         String
+  risk           String
+  ai_analysis    Json?
+  ai_analyzed_at DateTime?
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
 
   @@map("projects")
 }

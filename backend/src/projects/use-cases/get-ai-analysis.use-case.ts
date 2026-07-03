@@ -14,7 +14,7 @@ export class GetAiAnalysisUseCase {
     const project = await this.projectsRepository.findById(id);
     if (!project) throw new NotFoundException("Project not found");
 
-    return this.aiAnalysisService.analyze({
+    const result = await this.aiAnalysisService.analyze({
       name: project.name,
       description: project.description,
       status: project.status,
@@ -23,5 +23,10 @@ export class GetAiAnalysisUseCase {
       startDate: project.startDate,
       endDate: project.endDate,
     });
+
+    project.setAiAnalysis(result);
+    await this.projectsRepository.update(project);
+
+    return result;
   }
 }

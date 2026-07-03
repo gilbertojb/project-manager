@@ -1,6 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { ProjectRisk, ProjectStatus, STATUS_TRANSITIONS, UNDELETABLE_STATUSES } from './project.types';
 
+export interface AiAnalysisData {
+  summary: string;
+  attentionPoints: string[];
+  executiveRecommendation: string;
+}
+
 export interface ProjectProps {
   name: string;
   startDate: Date;
@@ -13,6 +19,8 @@ export interface ProjectData extends ProjectProps {
   id: string;
   status: ProjectStatus;
   risk: ProjectRisk;
+  aiAnalysis?: AiAnalysisData | null;
+  aiAnalyzedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -79,6 +87,12 @@ export class Project {
     }
   }
 
+  setAiAnalysis(analysis: AiAnalysisData): void {
+    this._data.aiAnalysis = analysis;
+    this._data.aiAnalyzedAt = new Date();
+    this._data.updatedAt = new Date();
+  }
+
   isDeletable(): boolean {
     return !UNDELETABLE_STATUSES.includes(this._data.status);
   }
@@ -91,6 +105,8 @@ export class Project {
   get description() { return this._data.description; }
   get status() { return this._data.status; }
   get risk() { return this._data.risk; }
+  get aiAnalysis() { return this._data.aiAnalysis ?? null; }
+  get aiAnalyzedAt() { return this._data.aiAnalyzedAt ?? null; }
   get createdAt() { return this._data.createdAt; }
   get updatedAt() { return this._data.updatedAt; }
   get data(): ProjectData { return { ...this._data }; }

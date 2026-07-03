@@ -15,6 +15,16 @@ export const projectSchema: SchemaObject = {
       example: "analysis",
     },
     risk: { type: "string", enum: ["low", "medium", "high"], example: "medium" },
+    aiAnalysis: {
+      nullable: true,
+      type: "object",
+      properties: {
+        summary: { type: "string" },
+        attentionPoints: { type: "array", items: { type: "string" } },
+        executiveRecommendation: { type: "string" },
+      },
+    },
+    aiAnalyzedAt: { type: "string", format: "date-time", nullable: true },
     createdAt: { type: "string", format: "date-time" },
     updatedAt: { type: "string", format: "date-time" },
   },

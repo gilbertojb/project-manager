@@ -16,6 +16,8 @@ export interface Project {
   description: string;
   status: ProjectStatus;
   risk: RiskLevel;
+  aiAnalysis: AiAnalysis | null;
+  aiAnalyzedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

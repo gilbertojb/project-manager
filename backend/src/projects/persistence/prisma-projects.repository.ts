@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import type { Project as PrismaProject } from "@prisma/client";
+import type { AiAnalysisData } from "@/projects/domain/project.entity";
 import { Project } from "@/projects/domain/project.entity";
 import type { ProjectRisk, ProjectStatus } from "@/projects/domain/project.types";
 import { IProjectsRepository } from "@/projects/repositories/projects.repository";
@@ -15,6 +16,8 @@ function toDomain(raw: PrismaProject): Project {
     description: raw.description,
     status: raw.status as ProjectStatus,
     risk: raw.risk as ProjectRisk,
+    aiAnalysis: raw.ai_analysis as AiAnalysisData | null,
+    aiAnalyzedAt: raw.ai_analyzed_at,
     createdAt: raw.created_at,
     updatedAt: raw.updated_at,
   });
@@ -30,6 +33,8 @@ function toRow(project: Project) {
     description: project.description,
     status: project.status as string,
     risk: project.risk as string,
+    ai_analysis: project.aiAnalysis ?? null,
+    ai_analyzed_at: project.aiAnalyzedAt,
     created_at: project.createdAt,
     updated_at: project.updatedAt,
   };

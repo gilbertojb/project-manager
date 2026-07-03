@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import {
+  BrainCircuit,
   Calendar,
   DollarSign,
+  Loader2,
   MoreVertical,
   Pencil,
   Trash2,
@@ -10,7 +12,7 @@ import {
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { deleteProject } from '@/api/projects';
+import { deleteProject, getAiAnalysis } from '@/api/projects';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +35,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { formatCurrency, formatDate } from '@/lib/formatters';
@@ -63,6 +66,20 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
     },
   });
 
+  const analysisMutation = useMutation({
+    mutationFn: () => getAiAnalysis(project.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast.success('Análise gerada com sucesso!');
+    },
+    onError: (err) => {
+      const message = isAxiosError(err)
+        ? (err.response?.data?.message ?? 'Erro ao gerar análise')
+        : 'Erro ao gerar análise';
+      toast.error(message);
+    },
+  });
+
   return (
     <>
       <Card className="flex flex-col">
@@ -77,8 +94,13 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
                   variant="ghost"
                   size="icon"
                   className="h-8 w-8 shrink-0"
+                  disabled={analysisMutation.isPending}
                 >
-                  <MoreVertical className="h-4 w-4" />
+                  {analysisMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <MoreVertical className="h-4 w-4" />
+                  )}
                   <span className="sr-only">Ações</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -87,14 +109,24 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
                   <Pencil className="mr-2 h-4 w-4" />
                   Editar
                 </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => analysisMutation.mutate()}
+                  disabled={analysisMutation.isPending}
+                >
+                  <BrainCircuit className="mr-2 h-4 w-4" />
+                  Solicitar análise com IA
+                </DropdownMenuItem>
                 {canDeleteProject(project.status) && (
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onClick={() => setShowDeleteDialog(true)}
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Excluir
-                  </DropdownMenuItem>
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={() => setShowDeleteDialog(true)}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>

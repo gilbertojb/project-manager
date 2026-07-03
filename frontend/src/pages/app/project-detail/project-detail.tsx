@@ -49,7 +49,7 @@ export function ProjectDetailPage() {
   });
 
   const {
-    data: aiAnalysis,
+    data: freshAiAnalysis,
     isFetching: isLoadingAi,
     isError: isAiError,
     refetch: generateAnalysis,
@@ -59,6 +59,8 @@ export function ProjectDetailPage() {
     enabled: false,
     retry: false,
   });
+
+  const aiAnalysis = freshAiAnalysis ?? project?.aiAnalysis ?? null;
 
   const is404 =
     isError && isAxiosError(error) && error.response?.status === 404;
