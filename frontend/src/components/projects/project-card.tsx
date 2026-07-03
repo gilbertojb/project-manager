@@ -1,0 +1,141 @@
+import { isAxiosError } from 'axios'
+import { Calendar, DollarSign, MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { deleteProject } from '@/api/projects'
+import { formatCurrency, formatDate } from '@/lib/formatters'
+import { canDeleteProject, type Project } from '@/types/project'
+import { ProjectRiskBadge } from './project-risk-badge'
+import { ProjectStatusBadge } from './project-status-badge'
+
+interface ProjectCardProps {
+  project: Project
+  onEdit: (project: Project) => void
+}
+
+export function ProjectCard({ project, onEdit }: ProjectCardProps) {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const queryClient = useQueryClient()
+
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteProject(project.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      toast.success('Projeto removido com sucesso!')
+    },
+    onError: (err) => {
+      const message = isAxiosError(err)
+        ? (err.response?.data?.message ?? 'Erro ao remover projeto')
+        : 'Erro ao remover projeto'
+      toast.error(message)
+    },
+  })
+
+  return (
+    <>
+      <Card className="flex flex-col">
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="line-clamp-2 text-base leading-tight">
+              {project.name}
+            </CardTitle>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                  <MoreVertical className="h-4 w-4" />
+                  <span className="sr-only">Ações</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onEdit(project)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Editar
+                </DropdownMenuItem>
+                {canDeleteProject(project.status) && (
+                  <DropdownMenuItem
+                    className="text-destructive focus:text-destructive"
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Excluir
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <ProjectStatusBadge status={project.status} />
+            <ProjectRiskBadge risk={project.risk} />
+          </div>
+        </CardHeader>
+
+        <CardContent className="flex-1 space-y-2 pb-3">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <DollarSign className="h-3.5 w-3.5 shrink-0" />
+            <span>{formatCurrency(project.budget)}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5 shrink-0" />
+            <span>
+              {formatDate(project.startDate)} → {formatDate(project.endDate)}
+            </span>
+          </div>
+        </CardContent>
+
+        <CardFooter className="pt-0">
+          <Button asChild variant="outline" size="sm" className="w-full">
+            <Link to={`/projects/${project.id}`}>Ver detalhes</Link>
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover projeto?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O projeto <strong>{project.name}</strong> será removido
+              permanentemente. Essa ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteMutation.mutate()}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Removendo...' : 'Remover'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  )
+}
