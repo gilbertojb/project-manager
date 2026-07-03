@@ -7,7 +7,7 @@ import { IAiClient, type AiAnalysisInput, type AiAnalysisResult } from "../ai/ai
 import { Project } from "../domain/project.entity";
 
 class FakeAiClient extends IAiClient {
-  analyze = vi.fn<[AiAnalysisInput], Promise<AiAnalysisResult>>();
+  analyze = vi.fn<(input: AiAnalysisInput) => Promise<AiAnalysisResult>>();
 }
 
 describe("GetAiAnalysisUseCase", () => {

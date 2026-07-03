@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import type { Project as PrismaProject } from "@prisma/client";
+import { Prisma, type Project as PrismaProject } from "@prisma/client";
 import type { AiAnalysisData } from "@/projects/domain/project.entity";
 import { Project } from "@/projects/domain/project.entity";
 import type { ProjectRisk, ProjectStatus } from "@/projects/domain/project.types";
@@ -33,7 +33,7 @@ function toRow(project: Project) {
     description: project.description,
     status: project.status as string,
     risk: project.risk as string,
-    ai_analysis: project.aiAnalysis ?? null,
+    ai_analysis: project.aiAnalysis ? (project.aiAnalysis as unknown as Prisma.InputJsonValue) : Prisma.DbNull,
     ai_analyzed_at: project.aiAnalyzedAt,
     created_at: project.createdAt,
     updated_at: project.updatedAt,
