@@ -1,16 +1,16 @@
 @baseUrl = http://localhost:3000
-@projectId = SUBSTITUA_PELO_ID_REAL
+@projectId = 487b283b-5d74-4265-a3fc-2e5ddf9167f6
 
 ### Criar projeto (risco LOW, curta duração e orçamento baixo)
 POST {{baseUrl}}/projects
 Content-Type: application/json
 
 {
-  "nome": "Portal do Colaborador",
-  "dataInicio": "2026-08-01",
-  "previsaoTermino": "2026-09-15",
-  "orcamentoTotal": 25000,
-  "descricao": "Portal interno para gestão de benefícios e ponto eletrônico."
+  "name": "Portal do Colaborador",
+  "startDate": "2026-08-01",
+  "endDate": "2026-09-15",
+  "budget": 25000,
+  "description": "Portal interno para gestão de benefícios e ponto eletrônico."
 }
 
 ###
@@ -20,11 +20,11 @@ POST {{baseUrl}}/projects
 Content-Type: application/json
 
 {
-  "nome": "ERP Corporativo",
-  "dataInicio": "2026-07-01",
-  "previsaoTermino": "2027-06-30",
-  "orcamentoTotal": 900000,
-  "descricao": "Implantação de ERP corporativo com módulos financeiro, RH e logística."
+  "name": "ERP Corporativo",
+  "startDate": "2026-07-01",
+  "endDate": "2027-06-30",
+  "budget": 900000,
+  "description": "Implantação de ERP corporativo com módulos financeiro, RH e logística."
 }
 
 ###
@@ -44,8 +44,8 @@ PATCH {{baseUrl}}/projects/{{projectId}}
 Content-Type: application/json
 
 {
-  "nome": "Portal do Colaborador v2",
-  "orcamentoTotal": 35000
+  "name": "Portal do Colaborador v2",
+  "budget": 35000
 }
 
 ###
