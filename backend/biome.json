@@ -11,8 +11,9 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "recommended",
-      "correctness": { "noUnusedVariables": "error" },
+      "correctness": {
+        "noUnusedVariables": "error"
+      },
       "style": { "noNonNullAssertion": "off" }
     }
   },
@@ -27,6 +28,13 @@
     "parser": { "unsafeParameterDecoratorsEnabled": true }
   },
   "files": {
-    "includes": ["**", "!node_modules/**", "!dist/**"]
+    "includes": [
+      "**",
+      "!node_modules/**",
+      "!dist/**",
+      "!backend/node_modules/**",
+      "!backend/dist/**",
+      "!.git/**"
+    ]
   }
 }

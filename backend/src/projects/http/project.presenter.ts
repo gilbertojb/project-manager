@@ -1,4 +1,4 @@
-import type { Project } from "../domain/project.entity";
+import type { Project } from "@/projects/domain/project.entity";
 
 export interface ProjectHttpResponse {
   id: string;
