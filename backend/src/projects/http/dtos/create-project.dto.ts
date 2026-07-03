@@ -2,17 +2,17 @@ import { z } from "zod";
 
 export const createProjectSchema = z
   .object({
-    nome: z.string().min(1, "nome is required").max(200),
-    dataInicio: z.coerce.date({ error: "dataInicio is required" }),
-    previsaoTermino: z.coerce.date({ error: "previsaoTermino is required" }),
-    orcamentoTotal: z
-      .number({ error: "orcamentoTotal is required" })
-      .positive("orcamentoTotal must be positive"),
-    descricao: z.string().min(1, "descricao is required"),
+    name: z.string().min(1, "name is required").max(200),
+    startDate: z.coerce.date({ error: "startDate is required" }),
+    endDate: z.coerce.date({ error: "endDate is required" }),
+    budget: z
+      .number({ error: "budget is required" })
+      .positive("budget must be positive"),
+    description: z.string().min(1, "description is required"),
   })
-  .refine((data) => data.previsaoTermino > data.dataInicio, {
-    message: "previsaoTermino must be after dataInicio",
-    path: ["previsaoTermino"],
+  .refine((data) => data.endDate > data.startDate, {
+    message: "endDate must be after startDate",
+    path: ["endDate"],
   });
 
 export type CreateProjectDto = z.infer<typeof createProjectSchema>;

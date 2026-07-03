@@ -3,7 +3,7 @@ import { NotFoundException } from "@nestjs/common";
 import { GetAiAnalysisUseCase } from "./get-ai-analysis.use-case";
 import { InMemoryProjectsRepository } from "../persistence/in-memory-projects.repository";
 import { AiAnalysisService } from "../ai/ai-analysis.service";
-import { IAiClient, AiAnalysisInput, AiAnalysisResult } from "../ai/ai.client";
+import { IAiClient, type AiAnalysisInput, type AiAnalysisResult } from "../ai/ai.client";
 import { Project } from "../domain/project.entity";
 
 class FakeAiClient extends IAiClient {

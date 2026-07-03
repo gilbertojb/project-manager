@@ -1,4 +1,4 @@
-import { Project } from "../domain/project.entity";
+import type { Project } from "../domain/project.entity";
 
 export abstract class IProjectsRepository {
   abstract findAll(): Promise<Project[]>;

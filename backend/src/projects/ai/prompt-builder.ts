@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AiAnalysisInput } from "./ai.client";
+import type { AiAnalysisInput } from "./ai.client";
 
 @Injectable()
 export class ProjectAnalysisPromptBuilder {

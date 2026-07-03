@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
-import { Project, ProjectProps } from "../domain/project.entity";
-import { IProjectsRepository } from "../repositories/projects.repository";
+import { Project, type ProjectProps } from "../domain/project.entity";
+import type { IProjectsRepository } from "../repositories/projects.repository";
 
 @Injectable()
 export class CreateProjectUseCase {

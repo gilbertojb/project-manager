@@ -1,35 +1,33 @@
-import { Project } from "../domain/project.entity";
+import type { Project } from "../domain/project.entity";
 
 export interface ProjectHttpResponse {
   id: string;
-  nome: string;
-  dataInicio: string;
-  previsaoTermino: string;
-  orcamentoTotal: number;
-  descricao: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  budget: number;
+  description: string;
   status: string;
-  risco: string;
-  criadoEm: string;
-  atualizadoEm: string;
+  risk: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export class ProjectPresenter {
-  static toHttp(project: Project): ProjectHttpResponse {
-    return {
-      id: project.id,
-      nome: project.name,
-      dataInicio: project.startDate.toISOString(),
-      previsaoTermino: project.endDate.toISOString(),
-      orcamentoTotal: project.budget,
-      descricao: project.description,
-      status: project.status,
-      risco: project.risk,
-      criadoEm: project.createdAt.toISOString(),
-      atualizadoEm: project.updatedAt.toISOString(),
-    };
-  }
+export function toHttp(project: Project): ProjectHttpResponse {
+  return {
+    id: project.id,
+    name: project.name,
+    startDate: project.startDate.toISOString(),
+    endDate: project.endDate.toISOString(),
+    budget: project.budget,
+    description: project.description,
+    status: project.status,
+    risk: project.risk,
+    createdAt: project.createdAt.toISOString(),
+    updatedAt: project.updatedAt.toISOString(),
+  };
+}
 
-  static toHttpList(projects: Project[]): ProjectHttpResponse[] {
-    return projects.map(ProjectPresenter.toHttp);
-  }
+export function toHttpList(projects: Project[]): ProjectHttpResponse[] {
+  return projects.map(toHttp);
 }

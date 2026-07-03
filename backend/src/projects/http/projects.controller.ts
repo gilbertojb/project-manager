@@ -1,30 +1,36 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
   Body,
+  Controller,
+  Delete,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
+  Patch,
+  Post,
 } from "@nestjs/common";
+
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { ZodValidationPipe } from "../../shared/pipes/zod-validation.pipe";
-import { CreateProjectUseCase } from "../use-cases/create-project.use-case";
-import { ListProjectsUseCase } from "../use-cases/list-projects.use-case";
-import { GetProjectUseCase } from "../use-cases/get-project.use-case";
-import { UpdateProjectUseCase } from "../use-cases/update-project.use-case";
-import { DeleteProjectUseCase } from "../use-cases/delete-project.use-case";
-import { UpdateProjectStatusUseCase } from "../use-cases/update-project-status.use-case";
-import { GetAiAnalysisUseCase } from "../use-cases/get-ai-analysis.use-case";
+
+import type { CreateProjectUseCase } from "../use-cases/create-project.use-case";
+import type { ListProjectsUseCase } from "../use-cases/list-projects.use-case";
+import type { GetProjectUseCase } from "../use-cases/get-project.use-case";
+import type { UpdateProjectUseCase } from "../use-cases/update-project.use-case";
+import type { DeleteProjectUseCase } from "../use-cases/delete-project.use-case";
+import type { UpdateProjectStatusUseCase } from "../use-cases/update-project-status.use-case";
+import type { GetAiAnalysisUseCase } from "../use-cases/get-ai-analysis.use-case";
+
 import type { CreateProjectDto } from "./dtos/create-project.dto";
 import { createProjectSchema } from "./dtos/create-project.dto";
+
 import type { UpdateProjectDto } from "./dtos/update-project.dto";
 import { updateProjectSchema } from "./dtos/update-project.dto";
+
 import type { UpdateStatusDto } from "./dtos/update-status.dto";
 import { updateStatusSchema } from "./dtos/update-status.dto";
-import { ProjectPresenter } from "./project.presenter";
+
+import { toHttp, toHttpList } from "./project.presenter";
 
 @ApiTags("projects")
 @Controller("projects")
@@ -42,28 +48,30 @@ export class ProjectsController {
   @Post()
   @ApiOperation({ summary: "Create a new project" })
   @ApiResponse({ status: 201, description: "Project created successfully" })
-  async create(@Body(new ZodValidationPipe(createProjectSchema)) dto: CreateProjectDto) {
+  async create(
+    @Body(new ZodValidationPipe(createProjectSchema)) dto: CreateProjectDto
+  ) {
     const project = await this.createProject.execute({
-      name: dto.nome,
-      startDate: dto.dataInicio,
-      endDate: dto.previsaoTermino,
-      budget: dto.orcamentoTotal,
-      description: dto.descricao,
+      name: dto.name,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
+      budget: dto.budget,
+      description: dto.description,
     });
-    return ProjectPresenter.toHttp(project);
+    return toHttp(project);
   }
 
   @Get()
   @ApiOperation({ summary: "List all projects" })
   async list() {
-    return ProjectPresenter.toHttpList(await this.listProjects.execute());
+    return toHttpList(await this.listProjects.execute());
   }
 
   @Get(":id")
   @ApiOperation({ summary: "Get project by ID" })
   @ApiResponse({ status: 404, description: "Project not found" })
   async findOne(@Param("id") id: string) {
-    return ProjectPresenter.toHttp(await this.getProject.execute(id));
+    return toHttp(await this.getProject.execute(id));
   }
 
   @Patch(":id")
@@ -73,13 +81,13 @@ export class ProjectsController {
     @Body(new ZodValidationPipe(updateProjectSchema)) dto: UpdateProjectDto,
   ) {
     const project = await this.updateProject.execute(id, {
-      ...(dto.nome !== undefined && { name: dto.nome }),
-      ...(dto.dataInicio !== undefined && { startDate: dto.dataInicio }),
-      ...(dto.previsaoTermino !== undefined && { endDate: dto.previsaoTermino }),
-      ...(dto.orcamentoTotal !== undefined && { budget: dto.orcamentoTotal }),
-      ...(dto.descricao !== undefined && { description: dto.descricao }),
+      ...(dto.name !== undefined && { name: dto.name }),
+      ...(dto.startDate !== undefined && { startDate: dto.startDate }),
+      ...(dto.endDate !== undefined && { endDate: dto.endDate }),
+      ...(dto.budget !== undefined && { budget: dto.budget }),
+      ...(dto.description !== undefined && { description: dto.description }),
     });
-    return ProjectPresenter.toHttp(project);
+    return toHttp(project);
   }
 
   @Delete(":id")
@@ -96,7 +104,7 @@ export class ProjectsController {
     @Param("id") id: string,
     @Body(new ZodValidationPipe(updateStatusSchema)) dto: UpdateStatusDto,
   ) {
-    return ProjectPresenter.toHttp(await this.updateStatus.execute(id, dto.status));
+    return toHttp(await this.updateStatus.execute(id, dto.status));
   }
 
   @Get(":id/ai-analysis")
