@@ -14,7 +14,10 @@
       "correctness": {
         "noUnusedVariables": "error"
       },
-      "style": { "noNonNullAssertion": "off" }
+      "style": {
+      "noNonNullAssertion": "off",
+      "useImportType": "off"
+    }
     }
   },
   "formatter": {

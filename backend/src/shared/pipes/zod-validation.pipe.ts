@@ -1,4 +1,4 @@
-import { type PipeTransform, BadRequestException } from "@nestjs/common";
+import { BadRequestException, type PipeTransform } from "@nestjs/common";
 import { z } from "zod";
 
 export class ZodValidationPipe implements PipeTransform {

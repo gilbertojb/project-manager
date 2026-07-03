@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
-import type { Project } from "../domain/project.entity";
-import type { ProjectStatus } from "../domain/project.types";
-import type { IProjectsRepository } from "../repositories/projects.repository";
+import type { Project } from "@/projects/domain/project.entity";
+import type { ProjectStatus } from "@/projects/domain/project.types";
+import { IProjectsRepository } from "@/projects/repositories/projects.repository";
 
 @Injectable()
 export class UpdateProjectStatusUseCase {

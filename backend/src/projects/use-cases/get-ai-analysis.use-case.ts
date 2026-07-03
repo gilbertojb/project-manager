@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import type { AiAnalysisResult } from "../ai/ai.client";
-import type { AiAnalysisService } from "../ai/ai-analysis.service";
-import type { IProjectsRepository } from "../repositories/projects.repository";
+import type { AiAnalysisResult } from "@/projects/ai/ai.client";
+import { AiAnalysisService } from "@/projects/ai/ai-analysis.service";
+import { IProjectsRepository } from "@/projects/repositories/projects.repository";
 
 @Injectable()
 export class GetAiAnalysisUseCase {

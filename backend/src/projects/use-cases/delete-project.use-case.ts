@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
-import type { IProjectsRepository } from "../repositories/projects.repository";
+import { IProjectsRepository } from "@/projects/repositories/projects.repository";
 
 @Injectable()
 export class DeleteProjectUseCase {

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import type { Project, ProjectProps } from "../domain/project.entity";
-import type { IProjectsRepository } from "../repositories/projects.repository";
+import type { Project, ProjectProps } from "@/projects/domain/project.entity";
+import { IProjectsRepository } from "@/projects/repositories/projects.repository";
 
 @Injectable()
 export class UpdateProjectUseCase {

@@ -12,13 +12,13 @@ import {
 
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
-import type { CreateProjectUseCase } from "@/projects/use-cases/create-project.use-case";
-import type { DeleteProjectUseCase } from "@/projects/use-cases/delete-project.use-case";
-import type { GetAiAnalysisUseCase } from "@/projects/use-cases/get-ai-analysis.use-case";
-import type { GetProjectUseCase } from "@/projects/use-cases/get-project.use-case";
-import type { ListProjectsUseCase } from "@/projects/use-cases/list-projects.use-case";
-import type { UpdateProjectUseCase } from "@/projects/use-cases/update-project.use-case";
-import type { UpdateProjectStatusUseCase } from "@/projects/use-cases/update-project-status.use-case";
+import { CreateProjectUseCase } from "@/projects/use-cases/create-project.use-case";
+import { DeleteProjectUseCase } from "@/projects/use-cases/delete-project.use-case";
+import { GetAiAnalysisUseCase } from "@/projects/use-cases/get-ai-analysis.use-case";
+import { GetProjectUseCase } from "@/projects/use-cases/get-project.use-case";
+import { ListProjectsUseCase } from "@/projects/use-cases/list-projects.use-case";
+import { UpdateProjectUseCase } from "@/projects/use-cases/update-project.use-case";
+import { UpdateProjectStatusUseCase } from "@/projects/use-cases/update-project-status.use-case";
 
 import { ZodValidationPipe } from "@/shared/pipes/zod-validation.pipe";
 

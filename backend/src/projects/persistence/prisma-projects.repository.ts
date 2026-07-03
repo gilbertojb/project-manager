@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import type { Project as PrismaProject } from "@prisma/client";
-import { Project } from "../domain/project.entity";
-import type { ProjectStatus, ProjectRisk } from "../domain/project.types";
-import { IProjectsRepository } from "../repositories/projects.repository";
-import type { PrismaService } from "../../shared/prisma/prisma.service";
+import { Project } from "@/projects/domain/project.entity";
+import type { ProjectStatus, ProjectRisk } from "@/projects/domain/project.types";
+import { IProjectsRepository } from "@/projects/repositories/projects.repository";
+import { PrismaService } from "@/shared/prisma/prisma.service";
 
 function toDomain(raw: PrismaProject): Project {
   return Project.restore({
