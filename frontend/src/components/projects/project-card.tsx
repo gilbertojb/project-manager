@@ -68,8 +68,11 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
 
   const analysisMutation = useMutation({
     mutationFn: () => getAiAnalysis(project.id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] });
+    onSuccess: (data) => {
+      queryClient.setQueryData(
+        ['projects', project.id],
+        (old: typeof project | undefined) => (old ? { ...old, aiAnalysis: data } : old),
+      );
       toast.success('Análise gerada com sucesso!');
     },
     onError: (err) => {
