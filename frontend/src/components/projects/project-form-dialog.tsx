@@ -45,7 +45,6 @@ export function ProjectFormDialog({
     mutationFn: (data: ProjectFormValues) => updateProject(project!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] })
-      queryClient.invalidateQueries({ queryKey: ['projects', project!.id] })
       onOpenChange(false)
       toast.success('Projeto atualizado com sucesso!')
     },

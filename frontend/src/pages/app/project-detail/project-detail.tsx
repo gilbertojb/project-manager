@@ -7,7 +7,7 @@ import {
   Loader2,
   RefreshCw,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -60,6 +60,12 @@ export function ProjectDetailPage() {
     retry: false,
   })
 
+  const is404 = isError && isAxiosError(error) && error.response?.status === 404
+
+  useEffect(() => {
+    if (is404) navigate('/projects', { replace: true })
+  }, [is404, navigate])
+
   const statusMutation = useMutation({
     mutationFn: (nextStatus: ProjectStatus) =>
       updateProjectStatus(id!, nextStatus),
@@ -87,11 +93,9 @@ export function ProjectDetailPage() {
     )
   }
 
+  if (is404) return null
+
   if (isError) {
-    if (isAxiosError(error) && error.response?.status === 404) {
-      navigate('/projects', { replace: true })
-      return null
-    }
     return (
       <div className="flex flex-col items-center gap-3 py-16 text-center">
         <p className="text-sm text-muted-foreground">
@@ -247,9 +251,9 @@ export function ProjectDetailPage() {
                   Pontos de atenção
                 </h3>
                 <ul className="space-y-1">
-                  {aiAnalysis.attentionPoints.map((point, idx) => (
+                  {aiAnalysis.attentionPoints.map((point) => (
                     <li
-                      key={idx}
+                      key={point}
                       className="flex gap-2 text-sm text-muted-foreground"
                     >
                       <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-yellow-400" />
