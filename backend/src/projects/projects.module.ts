@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { IProjectsRepository } from "./repositories/projects.repository";
-import { InMemoryProjectsRepository } from "./persistence/in-memory-projects.repository";
+import { PrismaProjectsRepository } from "./persistence/prisma-projects.repository";
+import { PrismaModule } from "../shared/prisma/prisma.module";
 import { IAiClient } from "./ai/ai.client";
 import { AnthropicAiClient } from "./ai/anthropic-ai.client";
 import { AiAnalysisService } from "./ai/ai-analysis.service";
@@ -15,9 +16,10 @@ import { GetAiAnalysisUseCase } from "./use-cases/get-ai-analysis.use-case";
 import { ProjectsController } from "./http/projects.controller";
 
 @Module({
+  imports: [PrismaModule],
   controllers: [ProjectsController],
   providers: [
-    { provide: IProjectsRepository, useClass: InMemoryProjectsRepository },
+    { provide: IProjectsRepository, useClass: PrismaProjectsRepository },
     { provide: IAiClient, useClass: AnthropicAiClient },
     ProjectAnalysisPromptBuilder,
     AiAnalysisService,
