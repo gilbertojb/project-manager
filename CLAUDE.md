@@ -1,38 +1,38 @@
-# Backend — Agent Rules
+# Project Manager — Regras do Agente
 
-## Stack
-- Node.js 20 + NestJS 10 + TypeScript (strict)
-- Biome for lint and formatting (no ESLint, no Prettier)
-- Zod for env and DTO validation
-- Vitest for unit tests
-- Anthropic SDK for AI integration
-- Swagger (@nestjs/swagger) for API documentation
+## Sobre o Projeto
 
-## Architecture
-Clean Architecture in 3 layers inside `src/projects/`:
-1. `domain/` — Project entity and types (zero framework dependency; English field names)
-2. `use-cases/` — Pure business logic, depends only on interfaces
-3. `http/` + `persistence/` — Infrastructure details (NestJS, in-memory store)
+Sistema de gerenciamento de projetos com análise de risco automática e análise executiva via IA (Claude Haiku). API REST em NestJS com persistência PostgreSQL via Prisma.
 
-HTTP layer uses Portuguese field names (DTOs and presenter responses).
-Controller maps Portuguese DTO fields to English domain props and vice-versa.
+## Estrutura do Repositório (Monorepo)
 
-AI module lives in `src/projects/ai/` with:
-- `IAiClient` (interface) → `AnthropicAiClient` (implementation)
-- `ProjectAnalysisPromptBuilder` (builds the prompt)
-- `AiAnalysisService` (orchestrates the two above)
+```
+project-manager/
+  backend/          ← API NestJS (ver backend/CLAUDE.md)
+  frontend/         ← (planejado)
+  docs/
+    specs/          ← design specs numeradas (01–07)
+    plans/          ← planos de implementação com código
+  docker-compose.yml está em backend/ (infraestrutura do backend)
+  client.http       ← exemplos de chamadas à API (VSCode REST Client)
+  AI_USAGE.md       ← documentação do uso de IA no projeto
+```
 
-## Hard Rules
-- Never put business logic in the controller
-- Never commit API keys — use `.env`
-- Risk is always recalculated inside the entity, never manually in a use-case
-- Status follows strict sequence: analysis → approved → in_progress → closed (any → cancelled)
-- Projects with status `in_progress` or `closed` cannot be deleted
-- Domain model: English names. HTTP API: Portuguese names.
+## Convenções Globais
 
-## Commands
-- Start dev: `pnpm run start:dev`
-- Run tests: `pnpm run test:unit`
-- Lint: `pnpm run lint`
-- Format: `pnpm run format`
-- Build: `pnpm run build`
+- **Specs:** salvar em `docs/specs/YYYY-MM-DD-NN-nome.md` (numeradas)
+- **Planos:** salvar em `docs/plans/YYYY-MM-DD-nome.md`
+- **Commits:** sem linha `Co-Authored-By`; mensagens em inglês
+- **Branches:** trabalho direto em `main` até haver time maior
+
+## Projetos
+
+- `backend/` — ver `backend/CLAUDE.md` para stack, arquitetura e comandos
+- `frontend/` — a definir
+
+## Metodologia
+
+Spec Driven Development com skills do Superpowers:
+1. `superpowers:brainstorming` → design + aprovação
+2. `superpowers:writing-plans` → plano em `docs/plans/`
+3. `superpowers:subagent-driven-development` → execução com review loop
