@@ -1,4 +1,4 @@
-import { isAxiosError } from 'axios'
+import { isAxiosError } from 'axios';
 import {
   ArrowLeft,
   Brain,
@@ -6,32 +6,32 @@ import {
   DollarSign,
   Loader2,
   RefreshCw,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { Helmet } from 'react-helmet-async'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { Skeleton } from '@/components/ui/skeleton'
-import { getAiAnalysis, getProject, updateProjectStatus } from '@/api/projects'
-import { ProjectFormDialog } from '@/components/projects/project-form-dialog'
-import { ProjectRiskBadge } from '@/components/projects/project-risk-badge'
-import { ProjectStatusBadge } from '@/components/projects/project-status-badge'
-import { formatCurrency, formatDate } from '@/lib/formatters'
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { getAiAnalysis, getProject, updateProjectStatus } from '@/api/projects';
+import { ProjectFormDialog } from '@/components/projects/project-form-dialog';
+import { ProjectRiskBadge } from '@/components/projects/project-risk-badge';
+import { ProjectStatusBadge } from '@/components/projects/project-status-badge';
+import { formatCurrency, formatDate } from '@/lib/formatters';
 import {
   ADVANCE_LABEL,
   NEXT_STATUS,
   canCancelProject,
   type ProjectStatus,
-} from '@/types/project'
+} from '@/types/project';
 
 export function ProjectDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const {
     data: project,
@@ -43,10 +43,10 @@ export function ProjectDetailPage() {
     queryFn: () => getProject(id!),
     enabled: !!id,
     retry: (_, err) => {
-      if (isAxiosError(err) && err.response?.status === 404) return false
-      return true
+      if (isAxiosError(err) && err.response?.status === 404) return false;
+      return true;
     },
-  })
+  });
 
   const {
     data: aiAnalysis,
@@ -58,29 +58,30 @@ export function ProjectDetailPage() {
     queryFn: () => getAiAnalysis(id!),
     enabled: false,
     retry: false,
-  })
+  });
 
-  const is404 = isError && isAxiosError(error) && error.response?.status === 404
+  const is404 =
+    isError && isAxiosError(error) && error.response?.status === 404;
 
   useEffect(() => {
-    if (is404) navigate('/projects', { replace: true })
-  }, [is404, navigate])
+    if (is404) navigate('/projects', { replace: true });
+  }, [is404, navigate]);
 
   const statusMutation = useMutation({
     mutationFn: (nextStatus: ProjectStatus) =>
       updateProjectStatus(id!, nextStatus),
     onSuccess: (updated) => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
-      queryClient.setQueryData(['projects', id], updated)
-      toast.success('Status atualizado com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      queryClient.setQueryData(['projects', id], updated);
+      toast.success('Status atualizado com sucesso!');
     },
     onError: (err) => {
       const message = isAxiosError(err)
         ? (err.response?.data?.message ?? 'Erro ao atualizar status')
-        : 'Erro ao atualizar status'
-      toast.error(message)
+        : 'Erro ao atualizar status';
+      toast.error(message);
     },
-  })
+  });
 
   if (isLoading) {
     return (
@@ -90,10 +91,10 @@ export function ProjectDetailPage() {
         <Skeleton className="h-32 w-full" />
         <Skeleton className="h-24 w-full" />
       </div>
-    )
+    );
   }
 
-  if (is404) return null
+  if (is404) return null;
 
   if (isError) {
     return (
@@ -105,14 +106,14 @@ export function ProjectDetailPage() {
           <Link to="/projects">Voltar para a lista</Link>
         </Button>
       </div>
-    )
+    );
   }
 
-  if (!project) return null
+  if (!project) return null;
 
-  const nextStatus = NEXT_STATUS[project.status]
-  const advanceLabel = ADVANCE_LABEL[project.status]
-  const showCancel = canCancelProject(project.status)
+  const nextStatus = NEXT_STATUS[project.status];
+  const advanceLabel = ADVANCE_LABEL[project.status];
+  const showCancel = canCancelProject(project.status);
 
   return (
     <>
@@ -160,7 +161,9 @@ export function ProjectDetailPage() {
           {project.description && (
             <div className="sm:col-span-2">
               <p className="text-xs text-muted-foreground">Descrição</p>
-              <p className="mt-1 text-sm leading-relaxed">{project.description}</p>
+              <p className="mt-1 text-sm leading-relaxed">
+                {project.description}
+              </p>
             </div>
           )}
         </div>
@@ -292,5 +295,5 @@ export function ProjectDetailPage() {
         project={project}
       />
     </>
-  )
+  );
 }

@@ -1,36 +1,41 @@
-import { FolderOpen, Plus } from 'lucide-react'
-import { useState } from 'react'
-import { Helmet } from 'react-helmet-async'
-import { useQuery } from '@tanstack/react-query'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { listProjects } from '@/api/projects'
-import { ProjectCard } from '@/components/projects/project-card'
-import { ProjectFormDialog } from '@/components/projects/project-form-dialog'
-import type { Project } from '@/types/project'
+import { FolderOpen, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { listProjects } from '@/api/projects';
+import { ProjectCard } from '@/components/projects/project-card';
+import { ProjectFormDialog } from '@/components/projects/project-form-dialog';
+import type { Project } from '@/types/project';
 
 export function ProjectsPage() {
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingProject, setEditingProject] = useState<Project | undefined>()
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | undefined>();
 
-  const { data: projects, isLoading, isError, refetch } = useQuery({
+  const {
+    data: projects,
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ['projects'],
     queryFn: listProjects,
-  })
+  });
 
   function handleCreate() {
-    setEditingProject(undefined)
-    setDialogOpen(true)
+    setEditingProject(undefined);
+    setDialogOpen(true);
   }
 
   function handleEdit(project: Project) {
-    setEditingProject(project)
-    setDialogOpen(true)
+    setEditingProject(project);
+    setDialogOpen(true);
   }
 
   function handleDialogClose(open: boolean) {
-    setDialogOpen(open)
-    if (!open) setEditingProject(undefined)
+    setDialogOpen(open);
+    if (!open) setEditingProject(undefined);
   }
 
   return (
@@ -102,5 +107,5 @@ export function ProjectsPage() {
         project={editingProject}
       />
     </>
-  )
+  );
 }

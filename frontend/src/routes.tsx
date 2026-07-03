@@ -1,7 +1,7 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { AppLayout } from './pages/_layouts/app'
-import { ProjectDetailPage } from './pages/app/project-detail/project-detail'
-import { ProjectsPage } from './pages/app/projects/projects'
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { AppLayout } from './pages/_layouts/app';
+import { ProjectDetailPage } from './pages/app/project-detail/project-detail';
+import { ProjectsPage } from './pages/app/projects/projects';
 
 export const router = createBrowserRouter([
   {
@@ -13,4 +13,4 @@ export const router = createBrowserRouter([
       { path: 'projects/:id', element: <ProjectDetailPage /> },
     ],
   },
-])
+]);

@@ -1,7 +1,7 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { Button } from '@/components/ui/button'
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -9,10 +9,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import type { UpdateProjectData } from '@/types/project'
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import type { UpdateProjectData } from '@/types/project';
 
 const projectSchema = z
   .object({
@@ -29,15 +29,15 @@ const projectSchema = z
   .refine((data) => new Date(data.endDate) > new Date(data.startDate), {
     message: 'Previsão de término deve ser posterior à data de início',
     path: ['endDate'],
-  })
+  });
 
-export type ProjectFormValues = z.infer<typeof projectSchema>
-type ProjectFormInput = z.input<typeof projectSchema>
+export type ProjectFormValues = z.infer<typeof projectSchema>;
+type ProjectFormInput = z.input<typeof projectSchema>;
 
 interface ProjectFormProps {
-  defaultValues?: UpdateProjectData
-  onSubmit: (data: ProjectFormValues) => Promise<void>
-  isSubmitting: boolean
+  defaultValues?: UpdateProjectData;
+  onSubmit: (data: ProjectFormValues) => Promise<void>;
+  isSubmitting: boolean;
 }
 
 export function ProjectForm({
@@ -54,7 +54,7 @@ export function ProjectForm({
       budget: defaultValues?.budget,
       description: defaultValues?.description ?? '',
     },
-  })
+  });
 
   return (
     <Form {...form}>
@@ -151,5 +151,5 @@ export function ProjectForm({
         </div>
       </form>
     </Form>
-  )
+  );
 }

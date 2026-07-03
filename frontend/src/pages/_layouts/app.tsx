@@ -1,10 +1,10 @@
-import { Moon, Sun } from 'lucide-react'
-import { Outlet } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { useTheme } from '@/components/theme/theme-provider'
+import { Moon, Sun } from 'lucide-react';
+import { Outlet } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useTheme } from '@/components/theme/theme-provider';
 
 export function AppLayout() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-background">
@@ -31,5 +31,5 @@ export function AppLayout() {
         <Outlet />
       </main>
     </div>
-  )
+  );
 }

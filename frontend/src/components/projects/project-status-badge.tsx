@@ -1,9 +1,9 @@
-import { Badge } from '@/components/ui/badge'
-import { cn } from '@/lib/utils'
-import { STATUS_LABELS, type ProjectStatus } from '@/types/project'
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { type ProjectStatus, STATUS_LABELS } from '@/types/project';
 
 interface ProjectStatusBadgeProps {
-  status: ProjectStatus
+  status: ProjectStatus;
 }
 
 const statusStyles: Record<ProjectStatus, string> = {
@@ -12,12 +12,15 @@ const statusStyles: Record<ProjectStatus, string> = {
   in_progress: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
   closed: 'bg-green-500/20 text-green-400 border-green-500/30',
   cancelled: 'bg-red-500/20 text-red-400 border-red-500/30',
-}
+};
 
 export function ProjectStatusBadge({ status }: ProjectStatusBadgeProps) {
   return (
-    <Badge variant="outline" className={cn('font-medium', statusStyles[status])}>
+    <Badge
+      variant="outline"
+      className={cn('font-medium', statusStyles[status])}
+    >
       {STATUS_LABELS[status]}
     </Badge>
-  )
+  );
 }

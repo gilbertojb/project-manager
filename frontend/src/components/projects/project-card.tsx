@@ -1,9 +1,16 @@
-import { isAxiosError } from 'axios'
-import { Calendar, DollarSign, MoreVertical, Pencil, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { toast } from 'sonner'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { isAxiosError } from 'axios';
+import {
+  Calendar,
+  DollarSign,
+  MoreVertical,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
+import { deleteProject } from '@/api/projects';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,49 +20,48 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { deleteProject } from '@/api/projects'
-import { formatCurrency, formatDate } from '@/lib/formatters'
-import { canDeleteProject, type Project } from '@/types/project'
-import { ProjectRiskBadge } from './project-risk-badge'
-import { ProjectStatusBadge } from './project-status-badge'
+} from '@/components/ui/dropdown-menu';
+import { formatCurrency, formatDate } from '@/lib/formatters';
+import { canDeleteProject, type Project } from '@/types/project';
+import { ProjectRiskBadge } from './project-risk-badge';
+import { ProjectStatusBadge } from './project-status-badge';
 
 interface ProjectCardProps {
-  project: Project
-  onEdit: (project: Project) => void
+  project: Project;
+  onEdit: (project: Project) => void;
 }
 
 export function ProjectCard({ project, onEdit }: ProjectCardProps) {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const queryClient = useQueryClient()
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
     mutationFn: () => deleteProject(project.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
-      toast.success('Projeto removido com sucesso!')
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast.success('Projeto removido com sucesso!');
     },
     onError: (err) => {
       const message = isAxiosError(err)
         ? (err.response?.data?.message ?? 'Erro ao remover projeto')
-        : 'Erro ao remover projeto'
-      toast.error(message)
+        : 'Erro ao remover projeto';
+      toast.error(message);
     },
-  })
+  });
 
   return (
     <>
@@ -67,7 +73,11 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
             </CardTitle>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                >
                   <MoreVertical className="h-4 w-4" />
                   <span className="sr-only">Ações</span>
                 </Button>
@@ -137,5 +147,5 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }
