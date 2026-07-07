@@ -1,14 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import {
-  BrainCircuit,
-  Calendar,
-  DollarSign,
-  Loader2,
-  MoreVertical,
-  Pencil,
-  Trash2,
-} from 'lucide-react';
+import { Loader2, MoreVertical, Pencil, Sparkles, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -71,7 +63,8 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
     onSuccess: (data) => {
       queryClient.setQueryData(
         ['projects', project.id],
-        (old: typeof project | undefined) => (old ? { ...old, aiAnalysis: data } : old),
+        (old: typeof project | undefined) =>
+          old ? { ...old, aiAnalysis: data } : old,
       );
       toast.success('Análise gerada com sucesso!');
     },
@@ -116,7 +109,7 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
                   onClick={() => analysisMutation.mutate()}
                   disabled={analysisMutation.isPending}
                 >
-                  <BrainCircuit className="mr-2 h-4 w-4" />
+                  <Sparkles className="mr-2 h-4 w-4" />
                   Solicitar análise com IA
                 </DropdownMenuItem>
                 {canDeleteProject(project.status) && (
@@ -139,22 +132,26 @@ export function ProjectCard({ project, onEdit }: ProjectCardProps) {
             <ProjectRiskBadge risk={project.risk} />
             {project.aiAnalysis && (
               <span title="Análise com IA disponível">
-                <BrainCircuit className="h-4 w-4 text-violet-400" />
+                <Sparkles className="h-4 w-4 text-muted-foreground" />
               </span>
             )}
           </div>
         </CardHeader>
 
-        <CardContent className="flex-1 space-y-2 pb-3">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <DollarSign className="h-3.5 w-3.5 shrink-0" />
-            <span>{formatCurrency(project.budget)}</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="h-3.5 w-3.5 shrink-0" />
-            <span>
-              {formatDate(project.startDate)} → {formatDate(project.endDate)}
-            </span>
+        <CardContent className="flex-1 pb-3">
+          <div className="grid grid-cols-2 gap-4 border-t pt-4">
+            <div>
+              <p className="text-xs text-muted-foreground">Orçamento</p>
+              <p className="mt-0.5 truncate text-sm font-medium">
+                {formatCurrency(project.budget)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Período</p>
+              <p className="mt-0.5 truncate text-sm font-medium">
+                {formatDate(project.startDate)} → {formatDate(project.endDate)}
+              </p>
+            </div>
           </div>
         </CardContent>
 

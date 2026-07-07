@@ -7,18 +7,20 @@ interface ProjectStatusBadgeProps {
 }
 
 const statusStyles: Record<ProjectStatus, string> = {
-  analysis: 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30',
-  approved: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  in_progress: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  closed: 'bg-green-500/20 text-green-400 border-green-500/30',
-  cancelled: 'bg-red-500/20 text-red-400 border-red-500/30',
+  analysis: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-500/15 dark:text-zinc-400',
+  approved: 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400',
+  in_progress:
+    'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400',
+  closed:
+    'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
+  cancelled: 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400',
 };
 
 export function ProjectStatusBadge({ status }: ProjectStatusBadgeProps) {
   return (
     <Badge
-      variant="outline"
-      className={cn('font-medium', statusStyles[status])}
+      variant="secondary"
+      className={cn('px-2.5 font-medium', statusStyles[status])}
     >
       {STATUS_LABELS[status]}
     </Badge>

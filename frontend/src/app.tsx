@@ -10,7 +10,7 @@ import { router } from './routes';
 export function App() {
   return (
     <HelmetProvider>
-      <ThemeProvider defaultTheme="dark" storageKey="pm-theme">
+      <ThemeProvider defaultTheme="light" storageKey="pm-theme">
         <Toaster richColors />
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />

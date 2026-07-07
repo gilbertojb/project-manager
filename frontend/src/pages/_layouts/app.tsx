@@ -1,16 +1,16 @@
 import { Moon, Sun } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { useTheme } from '@/components/theme/theme-provider';
+import { Button } from '@/components/ui/button';
 
 export function AppLayout() {
   const { theme, setTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-border/60 bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
-          <span className="text-sm font-semibold tracking-tight">
+          <span className="text-sm font-bold tracking-tight">
             Gestão de Projetos
           </span>
           <Button

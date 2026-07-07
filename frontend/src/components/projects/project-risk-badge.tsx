@@ -7,15 +7,19 @@ interface ProjectRiskBadgeProps {
 }
 
 const riskStyles: Record<RiskLevel, string> = {
-  low: 'bg-green-500/20 text-green-400 border-green-500/30',
-  medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  high: 'bg-red-500/20 text-red-400 border-red-500/30',
+  low: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400',
+  medium:
+    'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400',
+  high: 'bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400',
 };
 
 export function ProjectRiskBadge({ risk }: ProjectRiskBadgeProps) {
   return (
-    <Badge variant="outline" className={cn('font-medium', riskStyles[risk])}>
-      {RISK_LABELS[risk]}
+    <Badge
+      variant="secondary"
+      className={cn('px-2.5 font-medium', riskStyles[risk])}
+    >
+      Risco {RISK_LABELS[risk].toLowerCase()}
     </Badge>
   );
 }

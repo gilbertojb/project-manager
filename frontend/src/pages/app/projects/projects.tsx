@@ -46,7 +46,7 @@ export function ProjectsPage() {
 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight">Projetos</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Projetos</h1>
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
             Novo Projeto
@@ -56,7 +56,7 @@ export function ProjectsPage() {
         {isLoading && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-52 rounded-lg" />
+              <Skeleton key={i} className="h-52 rounded-xl" />
             ))}
           </div>
         )}

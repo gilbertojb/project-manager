@@ -1,29 +1,22 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
-import {
-  ArrowLeft,
-  Brain,
-  Calendar,
-  DollarSign,
-  Loader2,
-  RefreshCw,
-} from 'lucide-react';
+import { ArrowLeft, Loader2, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
 import { getAiAnalysis, getProject, updateProjectStatus } from '@/api/projects';
 import { ProjectFormDialog } from '@/components/projects/project-form-dialog';
-import { ProjectRiskBadge } from '@/components/projects/project-risk-badge';
+import { ProjectRiskGauge } from '@/components/projects/project-risk-gauge';
 import { ProjectStatusBadge } from '@/components/projects/project-status-badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatCurrency, formatDate } from '@/lib/formatters';
 import {
   ADVANCE_LABEL,
-  NEXT_STATUS,
   canCancelProject,
+  NEXT_STATUS,
   type ProjectStatus,
 } from '@/types/project';
 
@@ -131,89 +124,93 @@ export function ProjectDetailPage() {
           </Link>
         </Button>
 
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-2">
             <ProjectStatusBadge status={project.status} />
-            <ProjectRiskBadge risk={project.risk} />
+            <h1 className="text-2xl font-bold tracking-tight">
+              {project.name}
+            </h1>
           </div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            {project.name}
-          </h1>
-        </div>
-
-        <Separator />
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="flex items-start gap-3">
-            <DollarSign className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Orçamento</p>
-              <p className="font-medium">{formatCurrency(project.budget)}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground">Período</p>
-              <p className="font-medium">
-                {formatDate(project.startDate)} → {formatDate(project.endDate)}
-              </p>
-            </div>
-          </div>
-          {project.description && (
-            <div className="sm:col-span-2">
-              <p className="text-xs text-muted-foreground">Descrição</p>
-              <p className="mt-1 text-sm leading-relaxed">
-                {project.description}
-              </p>
-            </div>
-          )}
-        </div>
-
-        <Separator />
-
-        <div className="flex flex-wrap gap-2">
-          {nextStatus && advanceLabel && (
-            <Button
-              onClick={() => statusMutation.mutate(nextStatus)}
-              disabled={statusMutation.isPending}
-            >
-              {statusMutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {advanceLabel}
+          <div className="flex flex-wrap gap-2">
+            {nextStatus && advanceLabel && (
+              <Button
+                onClick={() => statusMutation.mutate(nextStatus)}
+                disabled={statusMutation.isPending}
+              >
+                {statusMutation.isPending && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {advanceLabel}
+              </Button>
+            )}
+            {showCancel && (
+              <Button
+                variant="destructive"
+                onClick={() => statusMutation.mutate('cancelled')}
+                disabled={statusMutation.isPending}
+              >
+                Cancelar projeto
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
+              Editar
             </Button>
-          )}
-          {showCancel && (
-            <Button
-              variant="destructive"
-              onClick={() => statusMutation.mutate('cancelled')}
-              disabled={statusMutation.isPending}
-            >
-              Cancelar projeto
-            </Button>
-          )}
-          <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
-            Editar
-          </Button>
+          </div>
         </div>
 
-        <Separator />
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-base">Informações</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-6 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">Orçamento</p>
+                  <p className="mt-0.5 font-medium">
+                    {formatCurrency(project.budget)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">Período</p>
+                  <p className="mt-0.5 font-medium">
+                    {formatDate(project.startDate)} →{' '}
+                    {formatDate(project.endDate)}
+                  </p>
+                </div>
+                {project.description && (
+                  <div className="sm:col-span-2">
+                    <p className="text-xs text-muted-foreground">Descrição</p>
+                    <p className="mt-1 text-sm leading-relaxed">
+                      {project.description}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="flex items-center justify-center">
+            <CardContent className="py-2">
+              <ProjectRiskGauge risk={project.risk} />
+            </CardContent>
+          </Card>
+        </div>
 
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <Brain className="h-5 w-5 text-muted-foreground" />
-            <h2 className="text-lg font-semibold">Análise com IA</h2>
+            <Sparkles className="h-5 w-5 text-muted-foreground" />
+            <h2 className="text-lg font-bold tracking-tight">Análise com IA</h2>
           </div>
 
           {!aiAnalysis && !isLoadingAi && !isAiError && (
-            <div className="rounded-lg border border-dashed p-6 text-center">
+            <div className="rounded-2xl border border-dashed p-6 text-center">
               <p className="mb-3 text-sm text-muted-foreground">
                 Gere uma análise executiva deste projeto com apoio de
                 Inteligência Artificial.
               </p>
               <Button onClick={() => generateAnalysis()} variant="outline">
-                <Brain className="mr-2 h-4 w-4" />
+                <Sparkles className="mr-2 h-4 w-4" />
                 Gerar análise
               </Button>
             </div>
@@ -227,7 +224,7 @@ export function ProjectDetailPage() {
           )}
 
           {isAiError && (
-            <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed p-6 text-center">
+            <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed p-6 text-center">
               <p className="text-sm text-muted-foreground">
                 Não foi possível gerar a análise.
               </p>
@@ -244,14 +241,14 @@ export function ProjectDetailPage() {
 
           {aiAnalysis && (
             <div className="space-y-4">
-              <div className="rounded-lg border p-4">
+              <div className="rounded-2xl border bg-card p-5 shadow-sm">
                 <h3 className="mb-2 text-sm font-semibold">Resumo</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {aiAnalysis.summary}
                 </p>
               </div>
 
-              <div className="rounded-lg border p-4">
+              <div className="rounded-2xl border bg-card p-5 shadow-sm">
                 <h3 className="mb-2 text-sm font-semibold">
                   Pontos de atenção
                 </h3>
@@ -261,14 +258,14 @@ export function ProjectDetailPage() {
                       key={point}
                       className="flex gap-2 text-sm text-muted-foreground"
                     >
-                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-yellow-400" />
+                      <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
                       {point}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <div className="rounded-lg border p-4">
+              <div className="rounded-2xl border bg-card p-5 shadow-sm">
                 <h3 className="mb-2 text-sm font-semibold">
                   Recomendação executiva
                 </h3>

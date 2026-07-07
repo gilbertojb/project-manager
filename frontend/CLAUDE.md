@@ -34,7 +34,7 @@ Estrutura de páginas espelha o projeto de referência (pizzashop-web):
 - Alias `@/` aponta para `./src/` — usar em todos os imports internos
 - Nunca criar `tailwind.config.js` ou `postcss.config.js` — TW v4 usa só o plugin Vite
 - Nunca commitar `.env` — apenas `.env.example`
-- Tema padrão: `dark` (passado via `defaultTheme="dark"` no `ThemeProvider` em `app.tsx`)
+- Tema padrão: `light` (passado via `defaultTheme="light"` no `ThemeProvider` em `app.tsx`) — design system claro/minimalista definido em `docs/specs/2026-07-06-10-frontend-design-system.md`
 - `storageKey` do tema: `"pm-theme"`
 - Commits em inglês, sem linha `Co-Authored-By`
 
@@ -73,6 +73,7 @@ frontend/
         project-form-dialog.tsx ← dialog de criar/editar projeto
         project-form.tsx        ← formulário react-hook-form
         project-risk-badge.tsx  ← badge de risco colorido
+        project-risk-gauge.tsx  ← gauge SVG de nível de risco (detalhe)
         project-status-badge.tsx ← badge de status colorido
     lib/
       utils.ts                  ← cn(): string (clsx + tailwind-merge)
@@ -98,8 +99,7 @@ frontend/
   components.json               ← config shadcn/ui
   biome.json                    ← lint + format (frontend-specific)
   vite.config.ts
-  tsconfig.json
-  tsconfig.node.json
+  tsconfig.json               ← único tsconfig (inclui src e vite.config.ts)
   package.json
   .env.example
 ```
